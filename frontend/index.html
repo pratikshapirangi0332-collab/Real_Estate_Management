@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HomeNest | Indian Real Estate</title>
+
+
+  <link rel="stylesheet" href="css/style.css"">
+</head>
+
+<body>
+
+<!-- =========================================================
+ NAVBAR
+========================================================= -->
+
+<nav class="navbar" id="navbar">
+
+<div class="nav-inner">
+
+<a class="logo" href="#home">
+ <div class="logo-mark">⌂</div>
+ <span>HomeNest</span>
+</a>
+
+<div class="nav-links">
+ <a href="#home" data-i18n="home">Home</a>
+ <a href="#properties" data-i18n="properties">Properties</a>
+ <a href="#map" data-i18n="explore">Explore</a>
+ <a href="#reviews" data-i18n="reviews">Reviews</a>
+ <a href="#contact" data-i18n="contact">Contact</a>
+</div>
+
+<div class="nav-right">
+
+<button class="nav-btn" onclick="changeLanguage()">
+ 🌐 <span id="languageName">English</span>
+</button>
+
+<button class="nav-btn" onclick="openUserPortal()">
+ 👤 User
+</button>
+
+<button class="primary-btn" onclick="openLogin()">
+ Login
+</button>
+
+</div>
+
+</div>
+</nav>
+
+
+<!-- =========================================================
+ HERO
+========================================================= -->
+
+<section class="hero" id="home">
+
+<div class="hero-content">
+
+<div class="hero-tag" data-i18n="tag">
+ ✨ India's smarter way to find your next home
+</div>
+
+<h1 id="heroTitle">
+ Find a place you'll be proud to
+ <span>call home.</span>
+</h1>
+
+<p class="hero-description" data-i18n="heroDescription">
+ Discover beautiful homes, apartments, villas and plots across India.
+ Compare properties, explore locations, chat with agents and find the
+ perfect place for your future.
+</p>
+
+<div class="search-box">
+
+<div class="search-item">
+ <span class="search-icon">📍</span>
+ <div>
+  <span class="search-label" data-i18n="location">LOCATION</span>
+  <select id="locationSelect">
+   <option value="all">All India</option>
+   <option>Bengaluru</option>
+   <option>Mumbai</option>
+   <option>Pune</option>
+   <option>Hyderabad</option>
+   <option>Delhi</option>
+   <option>Chennai</option>
+   <option>Belagavi</option>
+   <option>Bagalkot</option>
+  </select>
+ </div>
+</div>
+
+<div class="search-item">
+ <span class="search-icon">🏠</span>
+ <div>
+  <span class="search-label" data-i18n="type">PROPERTY TYPE</span>
+  <select id="typeSelect">
+   <option value="all">All Types</option>
+   <option>Apartment</option>
+   <option>Villa</option>
+   <option>Independent House</option>
+   <option>Plot</option>
+   <option>Farm House</option>
+   <option>Commercial</option>
+  </select>
+ </div>
+</div>
+
+<div class="search-item">
+ <span class="search-icon">💰</span>
+ <div>
+  <span class="search-label" data-i18n="budget">MAX BUDGET</span>
+  <select id="budgetSelect">
+   <option value="all">Any Budget</option>
+   <option value="50">₹50 Lakh</option>
+   <option value="100">₹1 Crore</option>
+   <option value="200">₹2 Crore</option>
+   <option value="500">₹5 Crore+</option>
+  </select>
+ </div>
+</div>
+
+<button class="search-submit" onclick="searchProperties()" data-i18n="search">
+ Search
+</button>
+
+</div>
+
+<div class="hero-stats">
+
+<div class="hero-stat">
+ <strong>12K+</strong>
+ <span data-i18n="verified">Verified Properties</span>
+</div>
+
+<div class="hero-stat">
+ <strong>4.9/5</strong>
+ <span data-i18n="buyerRating">Buyer Rating</span>
+</div>
+
+<div class="hero-stat">
+ <strong>28+</strong>
+ <span data-i18n="cities">Indian Cities</span>
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- =========================================================
+ CATEGORIES
+========================================================= -->
+
+<section class="categories">
+
+<div class="container">
+
+<div class="section-head">
+
+<div>
+ <div class="eyebrow" data-i18n="exploreHomes">Explore homes</div>
+ <h2 class="section-title" data-i18n="lifestyle">
+  Find what fits your lifestyle
+ </h2>
+</div>
+
+<p class="section-description" data-i18n="categoryDescription">
+ From modern city apartments to peaceful villas and spacious
+ independent houses, explore properties designed for every lifestyle.
+</p>
+
+</div>
+
+<div class="category-grid">
+
+<div class="category"
+style="background-image:url('https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=900&q=85')">
+<div class="category-icon">🏢</div>
+<h3>Apartment</h3>
+<p>4,850 listings</p>
+</div>
+
+<div class="category"
+style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85')">
+<div class="category-icon">🏡</div>
+<h3>Villa</h3>
+<p>2,140 listings</p>
+</div>
+
+<div class="category"
+style="background-image:url('https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=900&q=85')">
+<div class="category-icon">🏠</div>
+<h3>Independent House</h3>
+<p>3,220 listings</p>
+</div>
+
+<div class="category"
+style="background-image:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&q=85')">
+<div class="category-icon">🌳</div>
+<h3>Plot</h3>
+<p>1,560 listings</p>
+</div>
+
+<div class="category"
+style="background-image:url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=900&q=85')">
+<div class="category-icon">🌴</div>
+<h3>Farm House</h3>
+<p>780 listings</p>
+</div>
+
+</div>
+</div>
+</section>
+
+
+<!-- =========================================================
+ PROPERTIES
+========================================================= -->
+
+<section class="properties" id="properties">
+
+<div class="container">
+
+<div class="section-head">
+
+<div>
+ <div class="eyebrow">Handpicked for you</div>
+ <h2 class="section-title" data-i18n="featured">
+  Featured Indian Properties
+ </h2>
+</div>
+
+<p class="section-description">
+ Verified properties with pricing, bedrooms, bathrooms,
+ area, amenities and location information.
+</p>
+
+</div>
+
+<div class="property-grid" id="propertyGrid"></div>
+
+</div>
+</section>
+
+
+<!-- =========================================================
+ MAP
+========================================================= -->
+
+<section class="map-section" id="map">
+
+<div class="container">
+
+<div class="section-head">
+
+<div>
+ <div class="eyebrow">Explore nearby</div>
+ <h2 class="section-title">Properties around you</h2>
+</div>
+
+<p class="section-description">
+ Select a property to view its location and distance from
+ your current location.
+</p>
+
+</div>
+
+<div class="map-layout">
+
+<div class="map-sidebar">
+
+<h3>Nearby Properties</h3>
+
+<div id="mapPropertyList"></div>
+
+<button class="primary-btn"
+style="width:100%;margin-top:8px"
+onclick="openGoogleMapsLocation()">
+ 📍 Use My Current Location
+</button>
+
+</div>
+
+<div class="map" id="mapVisual">
+
+<div class="map-label" style="left:14%;top:18%">Whitefield</div>
+<div class="map-label" style="left:70%;top:22%">Bengaluru</div>
+<div class="map-label" style="left:20%;top:76%">Main Road</div>
+<div class="map-label" style="left:67%;top:76%">Tech Park</div>
+
+<div class="current-pin" id="currentPin"></div>
+
+<div class="distance-line" id="distanceLine"></div>
+
+<div id="mapPins"></div>
+
+</div>
+
+</div>
+</div>
+</section>
+
+
+<!-- =========================================================
+ EXPERIENCE
+========================================================= -->
+
+<section class="experience">
+
+<div class="container">
+
+<div class="experience-grid">
+
+<div>
+
+<div class="eyebrow" style="color:#ffb36d">
+ The HomeNest difference
+</div>
+
+<h2 class="section-title">
+ A smarter way to<br>
+ buy your next home.
+</h2>
+
+<p style="color:#c0cad7;line-height:1.8;margin-top:18px">
+ From discovering the right neighbourhood to connecting
+ with agents and completing your purchase, HomeNest brings
+ your entire property journey into one platform.
+</p>
+
+<div class="experience-list">
+
+<div class="experience-item">
+<div class="experience-icon">🛡️</div>
+<div>
+<strong>Verified listings</strong>
+<span>Property information reviewed before listing.</span>
+</div>
+</div>
+
+<div class="experience-item">
+<div class="experience-icon">🤖</div>
+<div>
+<strong>Property AI Agent</strong>
+<span>Ask questions and get property-specific answers.</span>
+</div>
+</div>
+
+<div class="experience-item">
+<div class="experience-icon">🌐</div>
+<div>
+<strong>Indian languages</strong>
+<span>Use the platform in your preferred language.</span>
+</div>
+</div>
+
+<div class="experience-item">
+<div class="experience-icon">🎙️</div>
+<div>
+<strong>Voice navigation</strong>
+<span>Navigate and search using your voice.</span>
+</div>
+</div>
+
+<div class="experience-item">
+<div class="experience-icon">⭐</div>
+<div>
+<strong>Verified reviews</strong>
+<span>Reviews connected to completed purchases.</span>
+</div>
+</div>
+
+<div class="experience-item">
+<div class="experience-icon">🔔</div>
+<div>
+<strong>Purchase tracking</strong>
+<span>See pending, confirmed and rejected requests.</span>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="experience-photo">
+
+<img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=85">
+
+<div class="experience-rating">
+<strong style="font-size:24px">4.9 / 5 ⭐</strong>
+<div style="font-size:10px;color:#777;margin-top:3px">
+Average buyer experience rating
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+</section>
+
+
+<!-- =========================================================
+ REVIEWS
+========================================================= -->
+
+<section class="reviews" id="reviews">
+
+<div class="container">
+
+<div class="section-head">
+
+<div>
+<div class="eyebrow">Real buyer stories</div>
+<h2 class="section-title">Loved by property buyers</h2>
+</div>
+
+</div>
+
+<div class="review-grid">
+
+<div class="review-card">
+<div class="review-top">
+<div class="avatar">AS</div>
+<div>
+<strong>Ananya Sharma</strong>
+<small>Verified Buyer</small>
+</div>
+</div>
+<div class="stars">★★★★★</div>
+<p>
+The property information was clear and the agent explained
+everything about the apartment. The map made checking the
+location very easy.
+</p>
+</div>
+
+<div class="review-card">
+<div class="review-top">
+<div class="avatar">RK</div>
+<div>
+<strong>Rahul Kumar</strong>
+<small>Verified Buyer</small>
+</div>
+</div>
+<div class="stars">★★★★★</div>
+<p>
+I compared multiple houses before choosing the one that
+suited my family. The bedroom and bathroom information
+was especially useful.
+</p>
+</div>
+
+<div class="review-card">
+<div class="review-top">
+<div class="avatar">SP</div>
+<div>
+<strong>Sneha Patil</strong>
+<small>Verified Buyer</small>
+</div>
+</div>
+<div class="stars">★★★★☆</div>
+<p>
+A clean interface with useful property information,
+wishlist support and easy agent communication.
+</p>
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- =========================================================
+ CTA
+========================================================= -->
+
+<section>
+
+<div class="container">
+
+<div class="cta-box">
+
+<h2>
+Your next chapter could start with one click.
+</h2>
+
+<p>
+Explore Indian properties, save your favourites, connect with
+agents and send a purchase request directly from HomeNest.
+</p>
+
+<button class="primary-btn"
+onclick="document.getElementById('properties').scrollIntoView()">
+Explore Properties →
+</button>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- =========================================================
+ FOOTER
+========================================================= -->
+
+<footer id="contact">
+
+<div class="footer-grid">
+
+<div>
+
+<div class="logo">
+<div class="logo-mark">⌂</div>
+HomeNest
+</div>
+
+<p style="margin-top:14px">
+A modern Indian real estate management platform for
+buyers, agents and administrators.
+</p>
+
+</div>
+
+<div>
+<h4>Explore</h4>
+<a href="#home">Home</a>
+<a href="#properties">Properties</a>
+<a href="#map">Map</a>
+<a href="#reviews">Reviews</a>
+</div>
+
+<div>
+<h4>Services</h4>
+<a href="#">Buy Property</a>
+<a href="#">Sell Property</a>
+<a href="#">Agent Chat</a>
+<a href="#">Property Reviews</a>
+</div>
+
+<div>
+<h4>Contact</h4>
+<p>📞 +91 98765 43210</p>
+<p>✉️ support@homenest.in</p>
+<p>📍 Karnataka, India</p>
+</div>
+
+</div>
+
+<div class="footer-bottom">
+© 2026 HomeNest Real Estate Management · Built for India
+</div>
+
+</footer>
+
+
+<!-- =========================================================
+ CHAT
+========================================================= -->
+
+<button class="chat-button" onclick="toggleChat()">💬</button>
+
+<div class="chat-window" id="chatWindow">
+
+<div class="chat-head">
+<strong id="chatTitle">HomeNest Property AI Agent</strong>
+<small>● Online · Property-aware assistant</small>
+</div>
+
+<div class="chat-messages" id="chatMessages">
+
+<div class="message bot">
+👋 Hello! I'm your HomeNest AI property assistant.
+Select a property and ask me about its price, bedrooms,
+bathrooms, area, amenities, location, buying process or suitability.
+</div>
+
+</div>
+
+<div class="chat-input">
+
+<input id="chatInput"
+placeholder="Ask about this property..."
+onkeydown="if(event.key==='Enter')sendMessage()">
+
+<button onclick="sendMessage()">➤</button>
+
+</div>
+
+</div>
+
+
+<!-- =========================================================
+ LOGIN MODAL
+========================================================= -->
+
+<div class="modal" id="loginModal">
+
+<div class="modal-box">
+
+<button class="close-btn" onclick="closeModal('loginModal')">×</button>
+
+<h2 class="modal-title">Welcome back</h2>
+
+<p class="modal-subtitle">
+Choose your portal and securely continue.
+</p>
+
+<div class="form-group">
+
+<label>LOGIN AS</label>
+
+<select id="loginRole">
+<option value="user">👤 User</option>
+<option value="admin">🔐 Administrator</option>
+</select>
+
+</div>
+
+<div class="form-group">
+<label>EMAIL</label>
+<input id="loginEmail" type="email" placeholder="Enter email">
+</div>
+
+<div class="form-group">
+<label>PASSWORD</label>
+<input id="loginPassword" type="password" placeholder="Enter password">
+</div>
+
+<button class="primary-btn"
+style="width:100%"
+onclick="login()">
+Login →
+</button>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+ PROPERTY DETAILS MODAL
+========================================================= -->
+
+<div class="modal" id="propertyModal">
+
+<div class="modal-box large">
+
+<button class="close-btn" onclick="closeModal('propertyModal')">×</button>
+
+<img id="modalImage"
+style="width:100%;height:300px;object-fit:cover;border-radius:18px">
+
+<div style="margin-top:20px">
+
+<div class="eyebrow">Verified Property</div>
+
+<h2 class="modal-title" id="modalTitle"></h2>
+
+<p id="modalLocation" style="color:#777;font-size:12px"></p>
+
+<div id="modalPrice"
+style="font-size:25px;font-weight:800;color:#172033;margin-top:12px">
+</div>
+
+<div id="modalFeatures"
+style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px">
+</div>
+
+<h3 style="margin-top:24px">Amenities</h3>
+
+<p id="modalAmenities"
+style="color:#68717e;line-height:1.8;font-size:12px;margin-top:7px">
+</p>
+
+<h3 style="margin-top:22px">About this property</h3>
+
+<p id="modalDescription"
+style="color:#68717e;line-height:1.8;font-size:12px;margin-top:7px">
+</p>
+
+<div class="card-buttons" style="margin-top:23px">
+
+    <button class="request-btn"
+    onclick="requestSelectedProperty()">
+        🏠 Request / Buy
+    </button>
+
+    <button class="view-btn"
+    onclick="chatAboutSelectedProperty()">
+        🤖 Ask Property AI
+    </button>
+
+    <button class="view-btn"
+    onclick="contactAgent(selectedProperty.id)">
+        💬 WhatsApp Agent
+    </button>
+
+    <button class="view-btn"
+    onclick="callAgent()">
+        📞 Call Agent
+    </button>
+
+    <button class="view-btn"
+        onclick="openPropertyRoute()">
+    📍 Property Location
+    </button>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+ USER PORTAL
+========================================================= -->
+
+<div class="portal" id="userPortal">
+
+<div class="portal-header">
+
+<div>
+<strong>HomeNest User Portal</strong>
+<small style="display:block;color:#aeb8c7">
+Your property journey
+</small>
+</div>
+
+<button class="primary-btn"
+onclick="closeUserPortal()">
+Close
+</button>
+
+</div>
+
+<div class="portal-main">
+
+<h1>User Dashboard</h1>
+
+<p style="color:#777;margin-top:5px">
+Track your requests, confirmations and purchased properties.
+</p>
+
+<div class="portal-grid">
+
+<div class="portal-stat">
+📩 Requests
+<strong id="userRequestCount">0</strong>
+</div>
+
+<div class="portal-stat">
+⏳ Pending
+<strong id="userPendingCount">0</strong>
+</div>
+
+<div class="portal-stat">
+✅ Confirmed
+<strong id="userConfirmedCount">0</strong>
+</div>
+
+<div class="portal-stat">
+❤️ Wishlist
+<strong id="userWishlistCount">0</strong>
+</div>
+
+</div>
+
+<div class="status-list">
+
+<h2>Property Requests</h2>
+
+<div id="userRequests"></div>
+
+</div>
+
+<div class="status-list">
+
+    <h2>❤️ My Wishlist</h2>
+
+    <div id="userWishlist"></div>
+
+</div>
+
+<div class="status-list">
+
+<h2>Messages from HomeNest Admin</h2>
+
+<div id="userNotifications"></div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+ ADMIN PORTAL
+========================================================= -->
+
+<div class="admin" id="adminPortal">
+
+<div class="admin-header">
+
+<div>
+<strong>HomeNest Admin Portal</strong>
+<small style="display:block;color:#aeb8c7">
+Restricted Management Dashboard
+</small>
+</div>
+
+<button class="primary-btn" onclick="logoutAdmin()">
+Logout
+</button>
+
+</div>
+
+<div class="admin-main">
+
+<h1>Admin Dashboard</h1>
+
+<p style="color:#777;margin-top:5px">
+Monitor property requests, users and property listings.
+</p>
+
+<div class="admin-cards">
+
+<div class="admin-card">
+📩 Requests
+<strong id="adminRequestCount">0</strong>
+</div>
+
+<div class="admin-card">
+⏳ Pending
+<strong id="adminPendingCount">0</strong>
+</div>
+
+<div class="admin-card">
+✅ Confirmed
+<strong id="adminConfirmedCount">0</strong>
+</div>
+
+<div class="admin-card">
+❌ Rejected
+<strong id="adminRejectedCount">0</strong>
+</div>
+
+<div class="admin-card">
+🏠 Properties
+<strong id="adminPropertyCount">0</strong>
+</div>
+
+</div>
+
+<div class="admin-actions">
+
+<button class="admin-action primary"
+onclick="openAddProperty()">
+＋ Add New Property
+</button>
+
+<button class="admin-action"
+onclick="showAdminSection('requests')">
+📩 Manage Requests
+</button>
+
+<button class="admin-action"
+onclick="showAdminSection('properties')">
+🏠 Manage Properties
+</button>
+
+<button class="admin-action"
+onclick="showAdminSection('users')">
+👥 Users
+</button>
+
+<button class="admin-action"
+onclick="refreshAdmin()">
+🔄 Refresh
+</button>
+
+</div>
+
+<div class="admin-table" id="adminRequestsSection">
+
+<h2>Buyer Requests</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Buyer</th>
+<th>Property</th>
+<th>Location</th>
+<th>Request</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="adminRequestsTable"></tbody>
+
+</table>
+
+</div>
+
+<div class="admin-table"
+id="adminPropertiesSection"
+style="display:none;margin-top:20px">
+
+<h2>Property Management</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Property</th>
+<th>Location</th>
+<th>Type</th>
+<th>Price</th>
+<th>Bedrooms</th>
+<th>Bathrooms</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="adminPropertiesTable"></tbody>
+
+</table>
+
+</div>
+
+<div class="admin-table"
+id="adminUsersSection"
+style="display:none;margin-top:20px">
+
+<h2>Registered Users</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Requests</th>
+<th>Confirmed</th>
+</tr>
+</thead>
+
+<tbody id="adminUsersTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+ ADD PROPERTY MODAL
+========================================================= -->
+
+<div class="modal" id="addPropertyModal">
+
+<div class="modal-box large">
+
+<button type="button"
+        class="close-btn"
+        onclick="closeAddPropertyModal()">
+    ×
+</button>
+
+<h2 class="modal-title">Add New Property</h2>
+
+<p class="modal-subtitle">
+Add a complete Indian property listing.
+</p>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>PROPERTY NAME</label>
+<input id="newName" placeholder="Luxury Garden Villa">
+</div>
+
+<div class="form-group">
+<label>LOCATION</label>
+<input id="newLocation" placeholder="Bengaluru">
+</div>
+
+<div class="form-group">
+<label>PROPERTY TYPE</label>
+<select id="newType">
+<option>Apartment</option>
+<option>Villa</option>
+<option>Independent House</option>
+<option>Plot</option>
+<option>Farm House</option>
+<option>Commercial</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>PRICE</label>
+<input id="newPrice" placeholder="₹1.25 Crore">
+</div>
+
+<div class="form-group">
+<label>BEDROOMS</label>
+<input id="newBedrooms" type="number" min="0" placeholder="3">
+</div>
+
+<div class="form-group">
+<label>BATHROOMS</label>
+<input id="newBathrooms" type="number" min="0" placeholder="3">
+</div>
+
+<div class="form-group">
+<label>AREA</label>
+<input id="newArea" placeholder="1850 sq.ft">
+</div>
+
+<div class="form-group">
+<label>PARKING</label>
+<input id="newParking" placeholder="2 Cars">
+</div>
+
+<div class="form-group">
+<label>FURNISHING</label>
+<select id="newFurnishing">
+<option>Semi Furnished</option>
+<option>Fully Furnished</option>
+<option>Unfurnished</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>FACING</label>
+<select id="newFacing">
+<option>East</option>
+<option>West</option>
+<option>North</option>
+<option>South</option>
+</select>
+</div>
+
+<div class="form-group full">
+<label>IMAGE URL</label>
+<input id="newImage"
+placeholder="https://images.unsplash.com/...">
+</div>
+
+<div class="form-group full">
+<label>AMENITIES</label>
+<input id="newAmenities"
+placeholder="Swimming Pool, Gym, Parking, Security, Garden">
+</div>
+
+<div class="form-group full">
+<label>DESCRIPTION</label>
+<textarea id="newDescription"
+placeholder="Describe the property, neighbourhood and facilities..."></textarea>
+</div>
+
+</div>
+
+<button class="primary-btn"
+style="width:100%;margin-top:5px"
+onclick="addNewProperty()">
+＋ Publish Property
+</button>
+
+</div>
+</div>
+<!-- =========================================================
+     GOOGLE TRANSLATE
+========================================================= -->
+
+<div id="google_translate_element"
+     style="position:fixed;
+            left:-9999px;
+            top:-9999px;
+            width:1px;
+            height:1px;
+            overflow:hidden;">
+</div>
+
+<script>
+window.googleTranslateReady = function () {
+
+    if (
+        typeof google === "undefined" ||
+        !google.translate
+    ) {
+        console.log("Google Translate API not ready.");
+        return;
+    }
+
+    const element =
+        document.getElementById("google_translate_element");
+
+    if (!element) {
+        console.log(
+            "Google Translate element not found."
+        );
+        return;
+    }
+
+    if (
+        element.querySelector(".goog-te-combo")
+    ) {
+        return;
+    }
+
+    new google.translate.TranslateElement(
+        {
+            pageLanguage: "en",
+
+            includedLanguages:
+                "en,kn,hi,mr,te,ta,ml,gu,bn,pa,ur,fr,de,es,ar,zh-CN,ja",
+
+            autoDisplay: false
+        },
+
+        "google_translate_element"
+    );
+
+    console.log(
+        "Google Translate loaded successfully."
+    );
+};
+</script>
+
+<script
+    src="https://translate.google.com/translate_a/element.js?cb=googleTranslateReady"
+    async>
+</script>
+
+<script
+  async
+  defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6jtFwq8th-0xx_42JqNJ9XGuQlFQVJtk&callback=initGoogleMap">
+</script>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
+
