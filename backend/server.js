@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
+
 const OpenAI = require("openai");
 const nodemailer = require("nodemailer");
 const connectDB = require("./config/db");
@@ -361,39 +361,32 @@ ${propertyContext}
 });
 
 /* =========================================================
-   FRONTEND
-========================================================= */
-
-const frontendFolder = path.join(
-  __dirname,
-  "..",
-  "frontend"
-);
-
-app.use(express.static(frontendFolder));
-
-/* =========================================================
-   HOME PAGE
+   HEALTH CHECK
 ========================================================= */
 
 app.get("/", (req, res) => {
-  res.sendFile(
-    path.join(
-      frontendFolder,
-      "index.html"
-    )
-  );
+  res.json({
+    success: true,
+    message: "HomeNest Backend is running successfully 🚀"
+  });
 });
 
 /* =========================================================
-   START SERVER
+   EXPORT APP FOR VERCEL
 ========================================================= */
 
-app.listen(
-  PORT,
-  () => {
+module.exports = app;
+
+/* =========================================================
+   LOCAL SERVER + VERCEL
+========================================================= */
+
+if (require.main === module) {
+  app.listen(PORT, () => {
     console.log(
       `Website is running: http://localhost:${PORT}`
     );
-  }
-);
+  });
+}
+
+module.exports = app;
