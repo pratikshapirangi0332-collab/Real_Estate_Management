@@ -218,6 +218,130 @@ let homeNestUserMarker = null;
 let homeNestPropertyMarker = null;
 let homeNestRouteLine = null;
 
+/* =========================================================
+   HOMENEST — LIVE BACKEND API
+========================================================= */
+
+const API_BASE_URL =
+    "https://homenest-backend-sable.vercel.app";
+
+
+async function apiRequest(
+    endpoint,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            API_BASE_URL + endpoint,
+            {
+                ...options,
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+                }
+            }
+        );
+
+    let data = null;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch (error) {
+
+        data = null;
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data?.error ||
+            data?.message ||
+            `API request failed: ${response.status}`
+        );
+    }
+
+    return data;
+}
+
+
+if (
+    status === "confirmed" &&
+    request.userEmail
+) {
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/email/property-confirmed",
+                {
+                    method: "POST",
+
+                    body: JSON.stringify({
+
+                        userEmail:
+                            request.userEmail,
+
+                        userName:
+                            request.userName ||
+                            "HomeNest User",
+
+                        propertyName:
+                            request.propertyName,
+
+                        location:
+                            request.location || ""
+
+                    })
+                }
+            );
+
+        if (!data) {
+
+            console.error(
+                "Email sending failed:",
+                data
+            );
+
+            showToast(
+                "Property confirmed, but email could not be sent."
+            );
+
+        } else {
+
+            showToast(
+                "Property confirmed and email sent successfully. 📧"
+            );
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Email notification error:",
+            error
+        );
+
+        showToast(
+            "Property confirmed. Email service is unavailable."
+        );
+    }
+
+} else {
+
+    showToast(
+        status === "confirmed"
+            ? "Property request confirmed."
+            : "Property request rejected."
+    );
+}
+
 
 /* =========================================================
    TRANSLATIONS
@@ -816,6 +940,218 @@ function toggleWishlist(id, button) {
     );
 
     updateUserPortal();
+}
+
+/* =========================================================
+   HOMENEST — LIVE BACKEND API CONFIGURATION
+   Vercel Frontend → Vercel Backend → MongoDB Atlas
+   ========================================================= */
+
+const API_BASE_URL =
+    "https://homenest-backend-sable.vercel.app";
+
+
+/* =========================================================
+   API HELPER
+   ========================================================= */
+
+async function apiRequest(endpoint, options = {}) {
+
+    const url =
+        API_BASE_URL +
+        endpoint;
+
+    try {
+
+        const response =
+            await fetch(url, {
+
+                ...options,
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+                }
+            });
+
+        let data = null;
+
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = null;
+        }
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.error ||
+                data?.message ||
+                `API request failed: ${response.status}`
+            );
+        }
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            "HomeNest API Error:",
+            error
+        );
+
+        throw error;
+    }
+}
+
+
+
+
+
+/* =========================================================
+   CREATE PROPERTY
+   ========================================================= */
+
+async function createPropertyOnBackend(
+    property
+) {
+
+    return await apiRequest(
+        "/api/properties",
+        {
+            method: "POST",
+
+            body: JSON.stringify(
+                property
+            )
+        }
+    );
+}
+
+
+/* =========================================================
+   UPDATE PROPERTY
+   ========================================================= */
+
+async function updatePropertyOnBackend(
+    id,
+    property
+) {
+
+    return await apiRequest(
+        "/api/properties/" +
+        encodeURIComponent(id),
+
+        {
+            method: "PUT",
+
+            body: JSON.stringify(
+                property
+            )
+        }
+    );
+}
+
+
+/* =========================================================
+   DELETE PROPERTY
+   ========================================================= */
+
+async function deletePropertyFromBackend(
+    id
+) {
+
+    return await apiRequest(
+        "/api/properties/" +
+        encodeURIComponent(id),
+
+        {
+            method: "DELETE"
+        }
+    );
+}
+
+
+/* =========================================================
+   EMAIL — PROPERTY CONFIRMED
+   ========================================================= */
+
+async function sendPropertyConfirmationEmail(
+    request
+) {
+
+    if (
+        !request ||
+        !request.userEmail
+    ) {
+
+        return null;
+    }
+
+    return await apiRequest(
+        "/api/email/property-confirmed",
+
+        {
+            method: "POST",
+
+            body: JSON.stringify({
+
+                userEmail:
+                    request.userEmail,
+
+                userName:
+                    request.userName ||
+                    "HomeNest User",
+
+                propertyName:
+                    request.propertyName,
+
+                location:
+                    request.location ||
+                    ""
+            })
+        }
+    );
+}
+
+
+/* =========================================================
+   AI PROPERTY CHAT
+   ========================================================= */
+
+async function askPropertyAI(
+    message
+) {
+
+    return await apiRequest(
+        "/api/ai/chat",
+
+        {
+            method: "POST",
+
+            body: JSON.stringify({
+
+                message:
+
+                    message,
+
+                property:
+                    selectedProperty ||
+                    null,
+
+                properties:
+                    properties,
+
+                history:
+                    typeof aiConversation !==
+                    "undefined"
+                        ? aiConversation.slice(-10)
+                        : []
+            })
+        }
+    );
 }
 
 // ============================================================
@@ -2859,8 +3195,8 @@ async function changeRequestStatus(id, status) {
         JSON.stringify(notifications)
     );
 
-    // ========================================================
-    // SEND EMAIL ONLY AFTER CONFIRMATION
+       // ========================================================
+    // SEND CONFIRMATION EMAIL THROUGH LIVE VERCEL BACKEND
     // ========================================================
 
     if (
@@ -2870,56 +3206,13 @@ async function changeRequestStatus(id, status) {
 
         try {
 
-            const response =
-                await fetch(
-                    "/api/email/property-confirmed",
-                    {
-                        method: "POST",
+            await sendPropertyConfirmationEmail(
+                request
+            );
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            userEmail:
-                                request.userEmail,
-
-                            userName:
-                                request.userName ||
-                                "HomeNest User",
-
-                            propertyName:
-                                request.propertyName,
-
-                            location:
-                                request.location || ""
-
-                        })
-                    }
-                );
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-
-                console.error(
-                    "Email sending failed:",
-                    data
-                );
-
-                showToast(
-                    "Property confirmed, but email could not be sent."
-                );
-
-            } else {
-
-                showToast(
-                    "Property confirmed and email sent successfully. 📧"
-                );
-            }
+            showToast(
+                "Property confirmed and email sent successfully. 📧"
+            );
 
         } catch (error) {
 
@@ -2929,7 +3222,7 @@ async function changeRequestStatus(id, status) {
             );
 
             showToast(
-                "Property confirmed. Email service is unavailable."
+                "Property confirmed. Email could not be sent."
             );
         }
 
@@ -2944,8 +3237,9 @@ async function changeRequestStatus(id, status) {
 
     updateAdmin();
     updateUserPortal();
-}
+} 
 
+   
 /* =========================================================
    ADMIN SECTIONS
 ========================================================= */
@@ -3956,6 +4250,8 @@ document.addEventListener(
         updateUserPortal();
 
         updateAdmin();
+
+        loadPropertiesFromBackend();
 
         try {
 
