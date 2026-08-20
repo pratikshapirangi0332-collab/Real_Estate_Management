@@ -1,3 +1,4 @@
+
 /* =========================================================
    HOMENEST — CORRECTED SCRIPT.JS
    Keeps existing HomeNest UI and fixes:
