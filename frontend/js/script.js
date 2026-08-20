@@ -218,7 +218,61 @@ let homeNestUserMarker = null;
 let homeNestPropertyMarker = null;
 let homeNestRouteLine = null;
 
+/* =========================================================
+   HOMENEST — LIVE BACKEND API
+   ========================================================= */
 
+const API_BASE_URL =
+    "https://homenest-backend-sable.vercel.app";
+
+
+/* =========================================================
+   API REQUEST HELPER
+   ========================================================= */
+
+async function apiRequest(
+    endpoint,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            API_BASE_URL + endpoint,
+            {
+                ...options,
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+                }
+            }
+        );
+
+    let data = null;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch (error) {
+
+        data = null;
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data?.error ||
+            data?.message ||
+            `API request failed: ${response.status}`
+        );
+    }
+
+    return data;
+}
 /* =========================================================
    TRANSLATIONS
 ========================================================= */
@@ -818,151 +872,428 @@ function toggleWishlist(id, button) {
     updateUserPortal();
 }
 
-// ============================================================
-// VIEW PROPERTY DETAILS
-// ============================================================
-
-window.openProperty = function (id) {
-
-    const property = properties.find(
-        p => String(p.id) === String(id)
-    );
-
-    if (!property) {
-        showToast("Property details not found.");
-        return;
-    }
-
-    // Remember selected property
-    selectedProperty = property;
-
-    const modal =
-        document.getElementById("propertyModal");
-
-    if (!modal) {
-        showToast("Property details window not found.");
-        return;
-    }
-
-    const modalImage =
-        document.getElementById("modalImage");
-
-    const modalTitle =
-        document.getElementById("modalTitle");
-
-    const modalLocation =
-        document.getElementById("modalLocation");
-
-    const modalPrice =
-        document.getElementById("modalPrice");
-
-    const modalFeatures =
-        document.getElementById("modalFeatures");
-
-    const modalAmenities =
-        document.getElementById("modalAmenities");
-
-    const modalDescription =
-        document.getElementById("modalDescription");
 
 
-    // Image
-    if (modalImage) {
+/* =========================================================
+   LOAD PROPERTIES FROM LIVE MONGODB BACKEND
+   ========================================================= */
 
-        modalImage.src =
-            property.image ||
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c";
+async function loadPropertiesFromBackend() {
 
-        modalImage.alt =
-            property.name || "Property";
-    }
+    try {
 
+        console.log(
+            "Loading properties from HomeNest backend..."
+        );
 
-    // Property name
-    if (modalTitle) {
-
-        modalTitle.textContent =
-            property.name ||
-            "Property";
-    }
-
-
-    // Location
-    if (modalLocation) {
-
-        modalLocation.textContent =
-            "📍 " +
-            (
-                property.location ||
-                property.city ||
-                property.address ||
-                "India"
+        const data =
+            await apiRequest(
+                "/api/properties"
             );
+
+        /*
+         * Backend may return:
+         *
+         * [
+         *   {...},
+         *   {...}
+         * ]
+         *
+         * OR
+         *
+         * {
+         *   properties: [...]
+         * }
+         */
+
+        const backendProperties =
+            Array.isArray(data)
+                ? data
+                : Array.isArray(data?.properties)
+                    ? data.properties
+                    : [];
+
+        if (
+            backendProperties.length > 0
+        ) {
+
+            properties =
+                backendProperties.map(
+                    property => ({
+
+                        ...property,
+
+                        /*
+                         * Keep HomeNest frontend
+                         * compatibility.
+                         */
+
+                        id:
+                            property.id ||
+                            property._id,
+
+                        priceText:
+                            property.priceText ||
+                            property.price ||
+                            "Price on request",
+
+                        location:
+                            property.location ||
+                            property.city ||
+                            property.address ||
+                            "India",
+
+                        city:
+                            property.city ||
+                            (
+                                property.location
+                                    ? property.location
+                                        .split(",")[0]
+                                        .trim()
+                                    : ""
+                            ),
+
+                        bedrooms:
+                            Number(
+                                property.bedrooms || 0
+                            ),
+
+                        bathrooms:
+                            Number(
+                                property.bathrooms || 0
+                            ),
+
+                        rating:
+                            Number(
+                                property.rating || 0
+                            ),
+
+                        reviews:
+                            Number(
+                                property.reviews || 0
+                            )
+                    })
+                );
+
+            /*
+             * Keep localStorage updated so the
+             * existing HomeNest UI continues working.
+             */
+
+            localStorage.setItem(
+                "hnProperties",
+                JSON.stringify(properties)
+            );
+
+            console.log(
+                "HomeNest properties loaded:",
+                properties.length
+            );
+
+            /*
+             * Refresh existing HomeNest UI.
+             */
+
+            if (
+                typeof renderProperties ===
+                "function"
+            ) {
+                renderProperties();
+            }
+
+            if (
+                typeof renderMap ===
+                "function"
+            ) {
+                renderMap();
+            }
+
+            if (
+                typeof updateAdmin ===
+                "function"
+            ) {
+                updateAdmin();
+            }
+
+            return properties;
+        }
+
+        console.warn(
+            "Backend returned no properties."
+        );
+
+        return properties;
+
+    } catch (error) {
+
+        console.error(
+            "Could not load properties from backend:",
+            error
+        );
+
+        showToast(
+            "Unable to load properties from server."
+        );
+
+        /*
+         * Keep existing local properties
+         * instead of breaking the website.
+         */
+
+        return properties;
+    }
+}
+
+
+/* =========================================================
+   CREATE PROPERTY
+   ========================================================= */
+
+async function createPropertyOnBackend(
+    property
+) {
+
+    return await apiRequest(
+        "/api/properties",
+        {
+            method: "POST",
+
+            body: JSON.stringify(
+                property
+            )
+        }
+    );
+}
+
+
+/* =========================================================
+   UPDATE PROPERTY
+   ========================================================= */
+
+async function updatePropertyOnBackend(
+    id,
+    property
+) {
+
+    return await apiRequest(
+        "/api/properties/" +
+        encodeURIComponent(id),
+
+        {
+            method: "PUT",
+
+            body: JSON.stringify(
+                property
+            )
+        }
+    );
+}
+
+
+/* =========================================================
+   DELETE PROPERTY
+   ========================================================= */
+
+async function deletePropertyFromBackend(
+    id
+) {
+
+    return await apiRequest(
+        "/api/properties/" +
+        encodeURIComponent(id),
+
+        {
+            method: "DELETE"
+        }
+    );
+}
+
+
+/* =========================================================
+   EMAIL — PROPERTY CONFIRMED
+   ========================================================= */
+
+async function sendPropertyConfirmationEmail(
+    request
+) {
+
+    if (
+        !request ||
+        !request.userEmail
+    ) {
+
+        return null;
     }
 
+    return await apiRequest(
+        "/api/email/property-confirmed",
 
-    // Price
-    if (modalPrice) {
+        {
+            method: "POST",
 
-        modalPrice.textContent =
-            property.priceText ||
-            "Price on request";
+            body: JSON.stringify({
+
+                userEmail:
+                    request.userEmail,
+
+                userName:
+                    request.userName ||
+                    "HomeNest User",
+
+                propertyName:
+                    request.propertyName,
+
+                location:
+                    request.location ||
+                    ""
+            })
+        }
+    );
+}
+
+
+/* =========================================================
+   AI PROPERTY CHAT
+   ========================================================= */
+
+async function askPropertyAI(
+    message
+) {
+
+    return await apiRequest(
+        "/api/ai/chat",
+
+        {
+            method: "POST",
+
+            body: JSON.stringify({
+
+                message:
+
+                    message,
+
+                property:
+                    selectedProperty ||
+                    null,
+
+                properties:
+                    properties,
+
+                history:
+                    typeof aiConversation !==
+                    "undefined"
+                        ? aiConversation.slice(-10)
+                        : []
+            })
+        }
+    );
+}
+
+// ============================================================
+// HOMENEST - GOOGLE MAPS DRIVING ROUTE
+// CURRENT LOCATION -> SELECTED PROPERTY
+// ============================================================
+
+window.openPropertyRoute = function () {
+
+    if (!selectedProperty) {
+        showToast("Please select a property first.");
+        return;
     }
 
+    const propertyLocation =
+        selectedProperty.location ||
+        selectedProperty.address ||
+        selectedProperty.city;
 
-    // Features
-    if (modalFeatures) {
-
-        modalFeatures.innerHTML = `
-
-            <span>
-                🛏️ ${property.bedrooms || 0} Bedrooms
-            </span>
-
-            <span>
-                🛁 ${property.bathrooms || 0} Bathrooms
-            </span>
-
-            <span>
-                📐 ${property.area || "N/A"}
-            </span>
-
-            <span>
-                🚗 ${property.parking || "N/A"}
-            </span>
-
-            <span>
-                🛋️ ${property.furnishing || "N/A"}
-            </span>
-
-            <span>
-                🧭 ${property.facing || "N/A"}
-            </span>
-        `;
+    if (!propertyLocation) {
+        showToast("Property location is not available.");
+        return;
     }
 
-
-    // Amenities
-    if (modalAmenities) {
-
-        modalAmenities.textContent =
-            property.amenities ||
-            "Amenities information not available.";
+    if (!navigator.geolocation) {
+        showToast("Your browser does not support location.");
+        return;
     }
 
+    showToast("Getting your current location...");
 
-    // Description
-    if (modalDescription) {
+    navigator.geolocation.getCurrentPosition(
 
-        modalDescription.textContent =
-            property.description ||
-            "No description available.";
-    }
+        function (position) {
 
+            const latitude =
+                position.coords.latitude;
 
-    // Open property modal
-    modal.classList.add("active");
+            const longitude =
+                position.coords.longitude;
+
+            const origin =
+                latitude + "," + longitude;
+
+            const destination =
+                propertyLocation + ", India";
+
+            const googleMapsURL =
+    "https://www.google.com/maps/dir/?api=1" +
+    "&origin=" +
+    encodeURIComponent(
+        latitude + "," + longitude
+    ) +
+    "&destination=" +
+    encodeURIComponent(
+        propertyLatitude + "," + propertyLongitude
+    ) +
+    "&travelmode=driving";
+
+            console.log(
+                "HomeNest Google Maps Route:",
+                googleMapsURL
+            );
+
+            window.open(
+                googleMapsURL,
+                "_blank"
+            );
+        },
+
+        function (error) {
+
+            console.error(
+                "Location error:",
+                error
+            );
+
+            if (error.code === 1) {
+                showToast(
+                    "Please allow location permission."
+                );
+            }
+            else if (error.code === 2) {
+                showToast(
+                    "Unable to find your current location."
+                );
+            }
+            else if (error.code === 3) {
+                showToast(
+                    "Location request timed out."
+                );
+            }
+            else {
+                showToast(
+                    "Unable to get your current location."
+                );
+            }
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+    );
 };
+
 
 /* =========================================================
    SELECTED PROPERTY LOCATION
@@ -986,135 +1317,80 @@ window.openSelectedPropertyLocation =
     };
 
 // ============================================================
-// GOOGLE MAPS
+// HOMENEST - REAL GOOGLE MAPS DRIVING ROUTE
 // CURRENT LOCATION → SELECTED PROPERTY
 // ============================================================
 
 window.openPropertyRoute = function () {
 
-    // Check selected property
     if (!selectedProperty) {
-
-        showToast(
-            "Please select a property first."
-        );
-
+        alert("Please select a property first.");
         return;
     }
 
-
-    // Get property location
-    const propertyLocation =
-        selectedProperty.location ||
-        selectedProperty.city ||
-        selectedProperty.address;
-
-
-    if (!propertyLocation) {
-
-        showToast(
-            "Property location is not available."
-        );
-
-        return;
-    }
-
-
-    // Check browser location support
     if (!navigator.geolocation) {
-
-        showToast(
-            "Your browser does not support location."
-        );
-
+        alert("Geolocation is not supported by your browser.");
         return;
     }
 
+    // Exact destination coordinates
+    const destination = getPropertyCoordinates(selectedProperty);
 
-    showToast(
-        "Getting your current location..."
-    );
-
+    if (!destination) {
+        alert("Property coordinates are missing.");
+        return;
+    }
 
     navigator.geolocation.getCurrentPosition(
-
         function (position) {
 
-            const latitude =
-                position.coords.latitude;
-
-            const longitude =
+            const origin =
+                position.coords.latitude +
+                "," +
                 position.coords.longitude;
 
+            const destinationCoords =
+                Number(destination.lat) +
+                "," +
+                Number(destination.lng);
 
-            const origin =
-                latitude + "," + longitude;
+            /*
+             * REAL GOOGLE MAPS DIRECTIONS
+             * Current GPS → Property GPS
+             */
+            const url =
+                "https://www.google.com/maps/dir/" +
+                origin +
+                "/" +
+                destinationCoords +
+                "?travelmode=driving";
 
+            console.log("ORIGIN:", origin);
+            console.log("DESTINATION:", destinationCoords);
+            console.log("GOOGLE ROUTE:", url);
 
-            const destination =
-                propertyLocation + ", India";
-
-
-            // REAL GOOGLE MAPS DIRECTIONS
-            const googleMapsURL =
-                "https://www.google.com/maps/dir/?api=1" +
-                "&origin=" +
-                encodeURIComponent(origin) +
-                "&destination=" +
-                encodeURIComponent(destination) +
-                "&travelmode=driving";
-
-
-            showToast(
-                "Opening Google Maps..."
-            );
-
-
-            window.open(
-                googleMapsURL,
-                "_blank"
-            );
+            // Open Google.com driving route
+            window.location.assign(url);
         },
-
 
         function (error) {
 
-            console.error(
-                "Location error:",
-                error
-            );
-
+            console.error("GPS ERROR:", error);
 
             if (error.code === 1) {
-
-                showToast(
-                    "Please allow location permission."
-                );
-
+                alert("Please allow location permission.");
             } else if (error.code === 2) {
-
-                showToast(
-                    "Current location could not be detected."
-                );
-
+                alert("Unable to determine your current location.");
             } else if (error.code === 3) {
-
-                showToast(
-                    "Location request timed out."
-                );
-
+                alert("Location request timed out.");
             } else {
-
-                showToast(
-                    "Unable to get your current location."
-                );
+                alert("Unable to get your current location.");
             }
         },
 
-
         {
             enableHighAccuracy: true,
-            timeout: 15000,
+            timeout: 20000,
             maximumAge: 0
         }
     );
@@ -1187,18 +1463,11 @@ function getPropertyCoordinates(property) {
 ========================================================= */
 window.initGoogleMap = function () {
 
-    const mapElement = document.getElementById("mapVisual");
+    const mapElement =
+        document.getElementById("mapVisual");
 
     if (!mapElement) {
         console.error("mapVisual element not found.");
-        return;
-    }
-
-    if (
-        typeof google === "undefined" ||
-        !google.maps
-    ) {
-        console.error("Google Maps API is not loaded.");
         return;
     }
 
@@ -1209,23 +1478,33 @@ window.initGoogleMap = function () {
                 lat: 15.8497,
                 lng: 74.4977
             },
-            zoom: 7,
+
+            zoom: 6,
 
             mapTypeControl: true,
+
             streetViewControl: true,
+
             fullscreenControl: true
         }
     );
 
-    console.log("Google Maps loaded successfully.");
+    // Create DirectionsService immediately
+    homeNestDirectionsService =
+        new google.maps.DirectionsService();
 
-    if (typeof renderMap === "function") {
-        renderMap();
-    }
+    console.log(
+        "Google Maps loaded successfully"
+    );
+
+    console.log(
+        "Google DirectionsService ready"
+    );
 };
 /* =========================================================
-   SHOW PROPERTY ON GOOGLE MAP
+   SHOW PROPERTY + REAL DRIVING ROUTE ON GOOGLE MAP
 ========================================================= */
+
 function showPropertyOnGoogleMap(property, userLocation = null) {
 
     if (!property) {
@@ -1233,25 +1512,47 @@ function showPropertyOnGoogleMap(property, userLocation = null) {
         return;
     }
 
+    // Google Maps API check
     if (
         typeof google === "undefined" ||
         !google.maps
     ) {
-        showToast("Google Maps is not loaded.");
-        console.error("Google Maps JavaScript API is not loaded.");
+        showToast("Google Maps is still loading. Please wait.");
+        console.error("Google Maps JavaScript API is not ready.");
         return;
     }
 
-    const destination = getPropertyCoordinates(property);
+    // Make sure the map has been initialized
+    if (!homeNestMap) {
+        showToast("Google Map is still loading. Please wait.");
+        console.error("homeNestMap is null.");
+        return;
+    }
 
-    if (!destination) {
+    // Get exact property coordinates
+    const destination =
+        getPropertyCoordinates(property);
+
+    if (
+        !destination ||
+        !Number.isFinite(Number(destination.lat)) ||
+        !Number.isFinite(Number(destination.lng))
+    ) {
         showToast("Property coordinates are not available.");
-        console.error("Invalid property coordinates:", property);
+        console.error(
+            "Invalid property coordinates:",
+            property
+        );
         return;
     }
 
-    // Scroll to map
-    const mapSection = document.getElementById("map");
+    // ========================================================
+    // SCROLL TO YOUR EXISTING MAP SECTION ONLY WHEN
+    // USER CLICKS VIEW LOCATION
+    // ========================================================
+
+    const mapSection =
+        document.getElementById("map");
 
     if (mapSection) {
         mapSection.scrollIntoView({
@@ -1260,102 +1561,165 @@ function showPropertyOnGoogleMap(property, userLocation = null) {
         });
     }
 
-    // Make sure map exists
-    if (!homeNestMap) {
-        showToast("Google Map is still loading.");
-        console.error("homeNestMap is null.");
-        return;
-    }
+    // ========================================================
+    // REMOVE OLD PROPERTY MARKER
+    // ========================================================
 
-    // Remove old property marker
     if (homeNestPropertyMarker) {
         homeNestPropertyMarker.setMap(null);
     }
 
-    // Remove old user marker
+    // ========================================================
+    // REMOVE OLD USER MARKER
+    // ========================================================
+
     if (homeNestUserMarker) {
         homeNestUserMarker.setMap(null);
     }
 
-    // Create PROPERTY marker
-    homeNestPropertyMarker = new google.maps.Marker({
-        position: destination,
-        map: homeNestMap,
-        title: property.name || "Property",
-        animation: google.maps.Animation.DROP
-    });
+    // ========================================================
+    // PROPERTY MARKER
+    // ========================================================
 
-    // If current location is not available,
-    // just show the property.
+    homeNestPropertyMarker =
+        new google.maps.Marker({
+            position: {
+                lat: Number(destination.lat),
+                lng: Number(destination.lng)
+            },
+
+            map: homeNestMap,
+
+            title:
+                property.name ||
+                "Selected Property",
+
+            animation:
+                google.maps.Animation.DROP
+        });
+
+    // ========================================================
+    // IF USER LOCATION IS NOT AVAILABLE
+    // ========================================================
+
     if (!userLocation) {
 
-        homeNestMap.setCenter(destination);
+        homeNestMap.setCenter({
+            lat: Number(destination.lat),
+            lng: Number(destination.lng)
+        });
+
         homeNestMap.setZoom(16);
 
         showToast(
-            "📍 " +
-            (property.name || "Property") +
-            " location shown."
+            "📍 Property location shown."
         );
 
         return;
     }
 
-    // Create CURRENT LOCATION marker
-    homeNestUserMarker = new google.maps.Marker({
-        position: userLocation,
-        map: homeNestMap,
-        title: "Your Current Location",
-        icon: {
-            url:
-                "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-        }
-    });
+    // ========================================================
+    // USER CURRENT LOCATION MARKER
+    // ========================================================
 
-    // Create Directions Service
-    if (!homeNestDirectionsService) {
-        homeNestDirectionsService =
-            new google.maps.DirectionsService();
-    }
+    homeNestUserMarker =
+        new google.maps.Marker({
 
-    // Create Directions Renderer
-    if (homeNestDirectionsRenderer) {
-        homeNestDirectionsRenderer.setMap(null);
-    }
-
-    homeNestDirectionsRenderer =
-        new google.maps.DirectionsRenderer({
-            map: homeNestMap,
-            suppressMarkers: true,
-            preserveViewport: false,
-
-            polylineOptions: {
-                strokeColor: "#d93025",
-                strokeOpacity: 1,
-                strokeWeight: 6
-            }
-        });
-
-    console.log("Getting REAL road route...");
-
-    // REAL GOOGLE ROAD ROUTE
-    homeNestDirectionsService.route(
-        {
-            origin: {
+            position: {
                 lat: Number(userLocation.lat),
                 lng: Number(userLocation.lng)
             },
 
-            destination: {
-                lat: Number(destination.lat),
-                lng: Number(destination.lng)
+            map: homeNestMap,
+
+            title:
+                "Your Current Location",
+
+            icon:
+                "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        });
+
+    // ========================================================
+    // GOOGLE DIRECTIONS SERVICE
+    // ========================================================
+
+    if (!homeNestDirectionsService) {
+
+        homeNestDirectionsService =
+            new google.maps.DirectionsService();
+    }
+
+    // Remove previous route
+    if (homeNestDirectionsRenderer) {
+
+        homeNestDirectionsRenderer.setMap(null);
+    }
+
+    // Create new route renderer
+    homeNestDirectionsRenderer =
+        new google.maps.DirectionsRenderer({
+
+            map: homeNestMap,
+
+            suppressMarkers: true,
+
+            preserveViewport: false,
+
+            polylineOptions: {
+
+                strokeColor: "#d93025",
+
+                strokeOpacity: 1,
+
+                strokeWeight: 6
+            }
+        });
+
+    console.log(
+        "Calculating REAL GOOGLE DRIVING ROUTE..."
+    );
+
+    console.log(
+        "CURRENT LOCATION:",
+        userLocation
+    );
+
+    console.log(
+        "PROPERTY LOCATION:",
+        destination
+    );
+
+    // ========================================================
+    // REAL GOOGLE DRIVING ROUTE
+    // ========================================================
+
+    homeNestDirectionsService.route(
+
+        {
+
+            origin: {
+
+                lat:
+                    Number(userLocation.lat),
+
+                lng:
+                    Number(userLocation.lng)
             },
 
-            travelMode: google.maps.TravelMode.DRIVING,
+            destination: {
 
-            optimizeWaypoints: false,
+                lat:
+                    Number(destination.lat),
 
-            provideRouteAlternatives: false
+                lng:
+                    Number(destination.lng)
+            },
+
+            travelMode:
+                google.maps.TravelMode.DRIVING,
+
+            provideRouteAlternatives:
+                false
         },
 
         function (result, status) {
@@ -1365,15 +1729,17 @@ function showPropertyOnGoogleMap(property, userLocation = null) {
                 status
             );
 
+            // ==================================================
+            // SUCCESS
+            // ==================================================
+
             if (
                 status ===
                 google.maps.DirectionsStatus.OK
             ) {
 
-                // THIS DRAWS THE REAL ROAD ROUTE
-                homeNestDirectionsRenderer.setDirections(
-                    result
-                );
+                homeNestDirectionsRenderer
+                    .setDirections(result);
 
                 const route =
                     result.routes[0];
@@ -1398,25 +1764,29 @@ function showPropertyOnGoogleMap(property, userLocation = null) {
                     );
 
                     showToast(
-                        "📍 Route found • " +
+                        "🚗 Driving route found • " +
                         leg.distance.text +
                         " • " +
                         leg.duration.text
                     );
                 }
 
-            } else {
-
-                console.error(
-                    "GOOGLE DIRECTIONS ERROR:",
-                    status
-                );
-
-                showToast(
-                    "Google could not calculate the road route: " +
-                    status
-                );
+                return;
             }
+
+            // ==================================================
+            // ERROR
+            // ==================================================
+
+            console.error(
+                "GOOGLE DIRECTIONS ERROR:",
+                status
+            );
+
+            showToast(
+                "Google route error: " +
+                status
+            );
         }
     );
 }
@@ -2152,46 +2522,14 @@ function login() {
         return;
     }
 
-    // Check if user exists in localStorage
-    let users = JSON.parse(localStorage.getItem("hnUsers") || "[]");
-    
-    let existingUser = users.find(u => u.email === email);
-    
-    if (existingUser) {
-        // Check password for existing user
-        if (existingUser.password !== password) {
-            showToast("Invalid password. Please try again.");
-            return;
-        }
-        
-        currentUser = {
-            name: existingUser.name,
-            email: existingUser.email,
-            address: existingUser.address,
-            contact: existingUser.contact
-        };
-    } else {
-        // Create new user
-        currentUser = {
-            name: email.split("@")[0],
-            email: email,
-            address: "",
-            contact: ""
-        };
-        
-        // Save new user with password
-        users.push({
-            name: currentUser.name,
-            email: currentUser.email,
-            password: password,
-            address: currentUser.address,
-            contact: currentUser.contact
-        });
-        
-        localStorage.setItem("hnUsers", JSON.stringify(users));
-        
-        showToast("Account created successfully!");
-    }
+    currentUser = {
+
+        name:
+            email.split("@")[0],
+
+        email:
+            email
+    };
 
     localStorage.setItem(
         "hnUser",
@@ -2726,94 +3064,6 @@ function updateAdmin() {
 }
 
 
-function renderAdminUsers() {
-
-    const table =
-        document.getElementById(
-            "adminUsersTable"
-        );
-
-    if (!table) {
-        return;
-    }
-
-    const users =
-        JSON.parse(
-            localStorage.getItem("hnUsers") || "[]"
-        );
-
-    if (!users.length) {
-
-        table.innerHTML =
-            `<tr>
-                <td colspan="6">
-                    No registered users yet.
-                </td>
-            </tr>`;
-
-        return;
-    }
-
-    table.innerHTML =
-        users
-            .map(
-                user => `
-
-                <tr>
-
-                    <td>
-                        ${escapeHTML(
-                            user.name
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            user.email
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            user.address || "N/A"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            user.contact || "N/A"
-                        )}
-                    </td>
-
-                    <td>
-                        ${
-                            requests.filter(
-                                r =>
-                                    r.userEmail ===
-                                    user.email
-                            ).length
-                        }
-                    </td>
-
-                    <td>
-                        ${
-                            requests.filter(
-                                r =>
-                                    r.userEmail ===
-                                    user.email &&
-                                    r.status ===
-                                        "confirmed"
-                            ).length
-                        }
-                    </td>
-
-                </tr>
-            `
-            )
-            .join("");
-}
-
-
 function renderAdminRequests() {
 
     const table =
@@ -2980,8 +3230,8 @@ async function changeRequestStatus(id, status) {
         JSON.stringify(notifications)
     );
 
-    // ========================================================
-    // SEND EMAIL ONLY AFTER CONFIRMATION
+       // ========================================================
+    // SEND CONFIRMATION EMAIL THROUGH LIVE VERCEL BACKEND
     // ========================================================
 
     if (
@@ -2991,56 +3241,13 @@ async function changeRequestStatus(id, status) {
 
         try {
 
-            const response =
-                await fetch(
-                    "/api/email/property-confirmed",
-                    {
-                        method: "POST",
+            await sendPropertyConfirmationEmail(
+                request
+            );
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            userEmail:
-                                request.userEmail,
-
-                            userName:
-                                request.userName ||
-                                "HomeNest User",
-
-                            propertyName:
-                                request.propertyName,
-
-                            location:
-                                request.location || ""
-
-                        })
-                    }
-                );
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-
-                console.error(
-                    "Email sending failed:",
-                    data
-                );
-
-                showToast(
-                    "Property confirmed, but email could not be sent."
-                );
-
-            } else {
-
-                showToast(
-                    "Property confirmed and email sent successfully. 📧"
-                );
-            }
+            showToast(
+                "Property confirmed and email sent successfully. 📧"
+            );
 
         } catch (error) {
 
@@ -3050,7 +3257,7 @@ async function changeRequestStatus(id, status) {
             );
 
             showToast(
-                "Property confirmed. Email service is unavailable."
+                "Property confirmed. Email could not be sent."
             );
         }
 
@@ -3065,8 +3272,9 @@ async function changeRequestStatus(id, status) {
 
     updateAdmin();
     updateUserPortal();
-}
+} 
 
+   
 /* =========================================================
    ADMIN SECTIONS
 ========================================================= */
@@ -4078,6 +4286,8 @@ document.addEventListener(
 
         updateAdmin();
 
+        loadPropertiesFromBackend();
+
         try {
 
             const savedCoords =
@@ -4221,5 +4431,410 @@ window.addEventListener(
             },
             1500
         );
+    }
+);
+
+// ============================================================
+// HOMENEST FINAL VIEW DETAILS FIX
+// Paste this at the VERY BOTTOM of script.js
+// ============================================================
+
+// Fix missing admin users function
+// This prevents updateAdmin() from stopping the rest of the website.
+if (typeof window.renderAdminUsers !== "function") {
+    window.renderAdminUsers = function () {
+
+        const table =
+            document.getElementById("adminUsersTable");
+
+        // If your HTML does not have this table,
+        // simply do nothing.
+        if (!table) {
+            return;
+        }
+
+        // Get users safely
+        let users = [];
+
+        try {
+            users =
+                JSON.parse(
+                    localStorage.getItem("hnUsers") || "[]"
+                );
+        } catch (error) {
+            console.error(
+                "Could not load HomeNest users:",
+                error
+            );
+
+            users = [];
+        }
+
+        if (!Array.isArray(users)) {
+            users = [];
+        }
+
+        if (users.length === 0) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        No registered users yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        table.innerHTML =
+            users.map(function (user) {
+
+                return `
+                    <tr>
+                        <td>
+                            ${user.name || "HomeNest User"}
+                        </td>
+
+                        <td>
+                            ${user.email || "—"}
+                        </td>
+
+                        <td>
+                            User
+                        </td>
+
+                        <td>
+                            ${user.date || "—"}
+                        </td>
+                    </tr>
+                `;
+
+            }).join("");
+    };
+}
+
+
+// ============================================================
+// FINAL VIEW DETAILS FUNCTION
+// ============================================================
+
+window.openProperty = function (id) {
+
+    console.log(
+        "HomeNest View Details clicked:",
+        id
+    );
+
+    // Find property safely.
+    const property =
+        (typeof properties !== "undefined"
+            ? properties
+            : []
+        ).find(function (p) {
+
+            return String(p.id) === String(id);
+
+        });
+
+    if (!property) {
+
+        console.error(
+            "Property not found:",
+            id
+        );
+
+        if (typeof showToast === "function") {
+            showToast(
+                "Property details not found."
+            );
+        }
+
+        return;
+    }
+
+    // Remember selected property.
+    selectedProperty = property;
+
+
+    // ========================================================
+    // PROPERTY MODAL
+    // ========================================================
+
+    const modal =
+        document.getElementById(
+            "propertyModal"
+        );
+
+    if (!modal) {
+
+        console.error(
+            "propertyModal element is missing in index.html"
+        );
+
+        if (typeof showToast === "function") {
+            showToast(
+                "Property details window is unavailable."
+            );
+        }
+
+        return;
+    }
+
+
+    // ========================================================
+    // IMAGE
+    // ========================================================
+
+    const modalImage =
+        document.getElementById(
+            "modalImage"
+        );
+
+    if (modalImage) {
+
+        modalImage.src =
+            property.image ||
+            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c";
+
+        modalImage.alt =
+            property.name ||
+            "HomeNest Property";
+    }
+
+
+    // ========================================================
+    // NAME
+    // ========================================================
+
+    const modalTitle =
+        document.getElementById(
+            "modalTitle"
+        );
+
+    if (modalTitle) {
+
+        modalTitle.textContent =
+            property.name ||
+            "Property";
+    }
+
+
+    // ========================================================
+    // LOCATION
+    // ========================================================
+
+    const modalLocation =
+        document.getElementById(
+            "modalLocation"
+        );
+
+    if (modalLocation) {
+
+        modalLocation.textContent =
+            "📍 " +
+            (
+                property.location ||
+                property.city ||
+                property.address ||
+                "India"
+            );
+    }
+
+
+    // ========================================================
+    // PRICE
+    // IMPORTANT:
+    // Use priceText first so your actual property price is shown.
+    // ========================================================
+
+    const modalPrice =
+        document.getElementById(
+            "modalPrice"
+        );
+
+    if (modalPrice) {
+
+        modalPrice.textContent =
+            property.priceText ||
+            property.price ||
+            "Price on request";
+    }
+
+
+    // ========================================================
+    // FEATURES
+    // ========================================================
+
+    const modalFeatures =
+        document.getElementById(
+            "modalFeatures"
+        );
+
+    if (modalFeatures) {
+
+        modalFeatures.innerHTML = `
+
+            <span class="status pending">
+                🛏 ${property.bedrooms || 0} Bedrooms
+            </span>
+
+            <span class="status confirmed">
+                🚿 ${property.bathrooms || 0} Bathrooms
+            </span>
+
+            <span class="status pending">
+                📐 ${property.area || "N/A"}
+            </span>
+
+            <span class="status confirmed">
+                🚗 ${property.parking || "N/A"}
+            </span>
+
+            <span class="status pending">
+                🧭 ${property.facing || "N/A"} Facing
+            </span>
+
+            <span class="status confirmed">
+                🛋 ${property.furnishing || "N/A"}
+            </span>
+
+        `;
+    }
+
+
+    // ========================================================
+    // AMENITIES
+    // ========================================================
+
+    const modalAmenities =
+        document.getElementById(
+            "modalAmenities"
+        );
+
+    if (modalAmenities) {
+
+        modalAmenities.textContent =
+            property.amenities ||
+            "Amenities information not available.";
+    }
+
+
+    // ========================================================
+    // DESCRIPTION
+    // ========================================================
+
+    const modalDescription =
+        document.getElementById(
+            "modalDescription"
+        );
+
+    if (modalDescription) {
+
+        modalDescription.textContent =
+            property.description ||
+            "No description available.";
+    }
+
+
+    // ========================================================
+    // OPEN MODAL
+    // ========================================================
+
+    modal.classList.add("active");
+
+    console.log(
+        "HomeNest property details opened:",
+        property.name
+    );
+};
+
+
+// ============================================================
+// GOOGLE MAP BUTTON FROM DETAILS MODAL
+// ============================================================
+
+window.openSelectedPropertyLocation = function () {
+
+    if (!selectedProperty) {
+
+        if (typeof showToast === "function") {
+            showToast(
+                "Please select a property first."
+            );
+        }
+
+        return;
+    }
+
+    if (
+        typeof showPropertyOnGoogleMap ===
+        "function"
+    ) {
+
+        showPropertyOnGoogleMap(
+            selectedProperty
+        );
+
+    } else {
+
+        // Fallback: open real Google Maps.
+        const location =
+            selectedProperty.location ||
+            selectedProperty.city ||
+            selectedProperty.address ||
+            "";
+
+        window.open(
+            "https://www.google.com/maps/search/?api=1&query=" +
+            encodeURIComponent(location),
+            "_blank"
+        );
+    }
+};
+
+
+// ============================================================
+// CLOSE PROPERTY MODAL
+// ============================================================
+
+window.closePropertyDetails = function () {
+
+    const modal =
+        document.getElementById(
+            "propertyModal"
+        );
+
+    if (modal) {
+
+        modal.classList.remove(
+            "active"
+        );
+    }
+};
+
+
+// ============================================================
+// SAFETY: PREVENT MODAL BACKDROP FROM BREAKING
+// ============================================================
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const modal =
+            document.getElementById(
+                "propertyModal"
+            );
+
+        if (
+            modal &&
+            event.target === modal
+        ) {
+
+            modal.classList.remove(
+                "active"
+            );
+        }
     }
 );
