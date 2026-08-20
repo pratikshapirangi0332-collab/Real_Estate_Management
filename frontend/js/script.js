@@ -905,7 +905,7 @@ window.openProperty = function (id) {
     if (modalPrice) {
 
         modalPrice.textContent =
-            property.price ||
+            property.priceText ||
             "Price on request";
     }
 
@@ -2152,14 +2152,46 @@ function login() {
         return;
     }
 
-    currentUser = {
-
-        name:
-            email.split("@")[0],
-
-        email:
-            email
-    };
+    // Check if user exists in localStorage
+    let users = JSON.parse(localStorage.getItem("hnUsers") || "[]");
+    
+    let existingUser = users.find(u => u.email === email);
+    
+    if (existingUser) {
+        // Check password for existing user
+        if (existingUser.password !== password) {
+            showToast("Invalid password. Please try again.");
+            return;
+        }
+        
+        currentUser = {
+            name: existingUser.name,
+            email: existingUser.email,
+            address: existingUser.address,
+            contact: existingUser.contact
+        };
+    } else {
+        // Create new user
+        currentUser = {
+            name: email.split("@")[0],
+            email: email,
+            address: "",
+            contact: ""
+        };
+        
+        // Save new user with password
+        users.push({
+            name: currentUser.name,
+            email: currentUser.email,
+            password: password,
+            address: currentUser.address,
+            contact: currentUser.contact
+        });
+        
+        localStorage.setItem("hnUsers", JSON.stringify(users));
+        
+        showToast("Account created successfully!");
+    }
 
     localStorage.setItem(
         "hnUser",
@@ -2691,6 +2723,94 @@ function updateAdmin() {
     renderAdminRequests();
     renderAdminProperties();
     renderAdminUsers();
+}
+
+
+function renderAdminUsers() {
+
+    const table =
+        document.getElementById(
+            "adminUsersTable"
+        );
+
+    if (!table) {
+        return;
+    }
+
+    const users =
+        JSON.parse(
+            localStorage.getItem("hnUsers") || "[]"
+        );
+
+    if (!users.length) {
+
+        table.innerHTML =
+            `<tr>
+                <td colspan="6">
+                    No registered users yet.
+                </td>
+            </tr>`;
+
+        return;
+    }
+
+    table.innerHTML =
+        users
+            .map(
+                user => `
+
+                <tr>
+
+                    <td>
+                        ${escapeHTML(
+                            user.name
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            user.email
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            user.address || "N/A"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            user.contact || "N/A"
+                        )}
+                    </td>
+
+                    <td>
+                        ${
+                            requests.filter(
+                                r =>
+                                    r.userEmail ===
+                                    user.email
+                            ).length
+                        }
+                    </td>
+
+                    <td>
+                        ${
+                            requests.filter(
+                                r =>
+                                    r.userEmail ===
+                                    user.email &&
+                                    r.status ===
+                                        "confirmed"
+                            ).length
+                        }
+                    </td>
+
+                </tr>
+            `
+            )
+            .join("");
 }
 
 
