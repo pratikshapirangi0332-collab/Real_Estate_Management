@@ -39,7 +39,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Fully Furnished",
         facing: "East",
-        image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         amenities: "Swimming Pool • Gym • 24×7 Security • Garden • CCTV • Power Backup",
         description: "A premium family villa in Whitefield with spacious rooms, modern interiors, excellent connectivity and peaceful surroundings.",
         rating: 4.9,
@@ -63,7 +63,7 @@ let properties = [
         parking: "1 Car",
         furnishing: "Semi Furnished",
         facing: "West",
-        image: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1605146769289-440113cc3d00?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         amenities: "Lift • Gym • Security • Parking • Club House • CCTV",
         description: "A modern apartment in Baner designed for comfortable urban living with excellent connectivity to offices and schools.",
         rating: 4.8,
@@ -87,7 +87,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Semi Furnished",
         facing: "North",
-        image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85",
+        image: "https://unsplash.com/photos/white-house-with-swimming-pool-g39p1kDjvSY",
         amenities: "Garden • Parking • CCTV • Security • Power Backup",
         description: "A spacious independent family home located in a well-connected residential neighbourhood of Belagavi.",
         rating: 4.7,
@@ -111,7 +111,7 @@ let properties = [
         parking: "1 Car",
         furnishing: "Fully Furnished",
         facing: "East",
-        image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1722421492323-eaf9c401befe?q=80&w=802&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         amenities: "Lift • Gym • Pool • Security • Club House • Parking",
         description: "A stylish city residence in Andheri West offering premium amenities and convenient access to Mumbai's major locations.",
         rating: 4.9,
@@ -135,7 +135,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Fully Furnished",
         facing: "South",
-        image: "https://images.unsplash.com/photo-1600047509782-20d39509f26d?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1721815693498-cc28507c0ba2?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         amenities: "Smart Home • Pool • Gym • Security • Garden • Parking",
         description: "A modern smart villa close to Gachibowli's technology and business district.",
         rating: 4.8,
@@ -159,7 +159,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Unfurnished",
         facing: "West",
-        image: "https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1531971589569-0d9370cbe1e5?q=80&w=1181&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         amenities: "Parking • Garden • Security • Water Supply",
         description: "A spacious home suitable for families looking for comfortable living in Bagalkot.",
         rating: 4.8,
@@ -220,11 +220,15 @@ let homeNestRouteLine = null;
 
 /* =========================================================
    HOMENEST — LIVE BACKEND API
-========================================================= */
+   ========================================================= */
 
 const API_BASE_URL =
     "https://homenest-backend-sable.vercel.app";
 
+
+/* =========================================================
+   API REQUEST HELPER
+   ========================================================= */
 
 async function apiRequest(
     endpoint,
@@ -269,80 +273,6 @@ async function apiRequest(
 
     return data;
 }
-
-
-if (
-    status === "confirmed" &&
-    request.userEmail
-) {
-
-    try {
-
-        const data =
-            await apiRequest(
-                "/api/email/property-confirmed",
-                {
-                    method: "POST",
-
-                    body: JSON.stringify({
-
-                        userEmail:
-                            request.userEmail,
-
-                        userName:
-                            request.userName ||
-                            "HomeNest User",
-
-                        propertyName:
-                            request.propertyName,
-
-                        location:
-                            request.location || ""
-
-                    })
-                }
-            );
-
-        if (!data) {
-
-            console.error(
-                "Email sending failed:",
-                data
-            );
-
-            showToast(
-                "Property confirmed, but email could not be sent."
-            );
-
-        } else {
-
-            showToast(
-                "Property confirmed and email sent successfully. 📧"
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Email notification error:",
-            error
-        );
-
-        showToast(
-            "Property confirmed. Email service is unavailable."
-        );
-    }
-
-} else {
-
-    showToast(
-        status === "confirmed"
-            ? "Property request confirmed."
-            : "Property request rejected."
-    );
-}
-
-
 /* =========================================================
    TRANSLATIONS
 ========================================================= */
@@ -942,72 +872,177 @@ function toggleWishlist(id, button) {
     updateUserPortal();
 }
 
-/* =========================================================
-   HOMENEST — LIVE BACKEND API CONFIGURATION
-   Vercel Frontend → Vercel Backend → MongoDB Atlas
-   ========================================================= */
-
-const API_BASE_URL =
-    "https://homenest-backend-sable.vercel.app";
 
 
 /* =========================================================
-   API HELPER
+   LOAD PROPERTIES FROM LIVE MONGODB BACKEND
    ========================================================= */
 
-async function apiRequest(endpoint, options = {}) {
-
-    const url =
-        API_BASE_URL +
-        endpoint;
+async function loadPropertiesFromBackend() {
 
     try {
 
-        const response =
-            await fetch(url, {
+        console.log(
+            "Loading properties from HomeNest backend..."
+        );
 
-                ...options,
-
-                headers: {
-                    "Content-Type":
-                        "application/json",
-
-                    ...(options.headers || {})
-                }
-            });
-
-        let data = null;
-
-        try {
-            data = await response.json();
-        } catch (error) {
-            data = null;
-        }
-
-        if (!response.ok) {
-
-            throw new Error(
-                data?.error ||
-                data?.message ||
-                `API request failed: ${response.status}`
+        const data =
+            await apiRequest(
+                "/api/properties"
             );
+
+        /*
+         * Backend may return:
+         *
+         * [
+         *   {...},
+         *   {...}
+         * ]
+         *
+         * OR
+         *
+         * {
+         *   properties: [...]
+         * }
+         */
+
+        const backendProperties =
+            Array.isArray(data)
+                ? data
+                : Array.isArray(data?.properties)
+                    ? data.properties
+                    : [];
+
+        if (
+            backendProperties.length > 0
+        ) {
+
+            properties =
+                backendProperties.map(
+                    property => ({
+
+                        ...property,
+
+                        /*
+                         * Keep HomeNest frontend
+                         * compatibility.
+                         */
+
+                        id:
+                            property.id ||
+                            property._id,
+
+                        priceText:
+                            property.priceText ||
+                            property.price ||
+                            "Price on request",
+
+                        location:
+                            property.location ||
+                            property.city ||
+                            property.address ||
+                            "India",
+
+                        city:
+                            property.city ||
+                            (
+                                property.location
+                                    ? property.location
+                                        .split(",")[0]
+                                        .trim()
+                                    : ""
+                            ),
+
+                        bedrooms:
+                            Number(
+                                property.bedrooms || 0
+                            ),
+
+                        bathrooms:
+                            Number(
+                                property.bathrooms || 0
+                            ),
+
+                        rating:
+                            Number(
+                                property.rating || 0
+                            ),
+
+                        reviews:
+                            Number(
+                                property.reviews || 0
+                            )
+                    })
+                );
+
+            /*
+             * Keep localStorage updated so the
+             * existing HomeNest UI continues working.
+             */
+
+            localStorage.setItem(
+                "hnProperties",
+                JSON.stringify(properties)
+            );
+
+            console.log(
+                "HomeNest properties loaded:",
+                properties.length
+            );
+
+            /*
+             * Refresh existing HomeNest UI.
+             */
+
+            if (
+                typeof renderProperties ===
+                "function"
+            ) {
+                renderProperties();
+            }
+
+            if (
+                typeof renderMap ===
+                "function"
+            ) {
+                renderMap();
+            }
+
+            if (
+                typeof updateAdmin ===
+                "function"
+            ) {
+                updateAdmin();
+            }
+
+            return properties;
         }
 
-        return data;
+        console.warn(
+            "Backend returned no properties."
+        );
+
+        return properties;
 
     } catch (error) {
 
         console.error(
-            "HomeNest API Error:",
+            "Could not load properties from backend:",
             error
         );
 
-        throw error;
+        showToast(
+            "Unable to load properties from server."
+        );
+
+        /*
+         * Keep existing local properties
+         * instead of breaking the website.
+         */
+
+        return properties;
     }
 }
-
-
-
 
 
 /* =========================================================
