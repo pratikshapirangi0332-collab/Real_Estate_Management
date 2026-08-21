@@ -1,4 +1,3 @@
-
 /* =========================================================
    HOMENEST — CORRECTED SCRIPT.JS
    Keeps existing HomeNest UI and fixes:
@@ -40,7 +39,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Fully Furnished",
         facing: "East",
-        image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=85",
         amenities: "Swimming Pool • Gym • 24×7 Security • Garden • CCTV • Power Backup",
         description: "A premium family villa in Whitefield with spacious rooms, modern interiors, excellent connectivity and peaceful surroundings.",
         rating: 4.9,
@@ -64,7 +63,7 @@ let properties = [
         parking: "1 Car",
         furnishing: "Semi Furnished",
         facing: "West",
-        image: "https://images.unsplash.com/photo-1605146769289-440113cc3d00?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1200&q=85",
         amenities: "Lift • Gym • Security • Parking • Club House • CCTV",
         description: "A modern apartment in Baner designed for comfortable urban living with excellent connectivity to offices and schools.",
         rating: 4.8,
@@ -88,7 +87,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Semi Furnished",
         facing: "North",
-        image: "https://unsplash.com/photos/white-house-with-swimming-pool-g39p1kDjvSY",
+        image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85",
         amenities: "Garden • Parking • CCTV • Security • Power Backup",
         description: "A spacious independent family home located in a well-connected residential neighbourhood of Belagavi.",
         rating: 4.7,
@@ -112,7 +111,7 @@ let properties = [
         parking: "1 Car",
         furnishing: "Fully Furnished",
         facing: "East",
-        image: "https://images.unsplash.com/photo-1722421492323-eaf9c401befe?q=80&w=802&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
         amenities: "Lift • Gym • Pool • Security • Club House • Parking",
         description: "A stylish city residence in Andheri West offering premium amenities and convenient access to Mumbai's major locations.",
         rating: 4.9,
@@ -136,7 +135,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Fully Furnished",
         facing: "South",
-        image: "https://images.unsplash.com/photo-1721815693498-cc28507c0ba2?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1600047509782-20d39509f26d?auto=format&fit=crop&w=1200&q=85",
         amenities: "Smart Home • Pool • Gym • Security • Garden • Parking",
         description: "A modern smart villa close to Gachibowli's technology and business district.",
         rating: 4.8,
@@ -160,7 +159,7 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Unfurnished",
         facing: "West",
-        image: "https://images.unsplash.com/photo-1531971589569-0d9370cbe1e5?q=80&w=1181&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1200&q=85",
         amenities: "Parking • Garden • Security • Water Supply",
         description: "A spacious home suitable for families looking for comfortable living in Bagalkot.",
         rating: 4.8,
@@ -173,18 +172,125 @@ let properties = [
 
 
 /* =========================================================
+   LOCAL STORAGE HELPERS
+   Storage can throw (corrupt JSON, exceeded quota, disabled
+   storage). Reads fall back to a known-good value and writes
+   report the failure instead of failing silently.
+========================================================= */
+
+function reportStorageError(message, error) {
+
+    console.error(message, error);
+
+    if (typeof showToast === "function") {
+        showToast(message);
+    }
+}
+
+
+function readStoredValue(key) {
+
+    try {
+        return localStorage.getItem(key);
+    } catch (error) {
+        console.error(
+            "Could not read stored key:",
+            key,
+            error
+        );
+
+        return null;
+    }
+}
+
+
+function readStoredJSON(key, fallback) {
+
+    const raw = readStoredValue(key);
+
+    if (raw === null) {
+        return fallback;
+    }
+
+    let parsed = null;
+
+    try {
+        parsed = JSON.parse(raw);
+    } catch (error) {
+        reportStorageError(
+            `Saved HomeNest data (${key}) was corrupted and has been reset.`,
+            error
+        );
+
+        try {
+            localStorage.removeItem(key);
+        } catch (removeError) {
+            console.error(
+                "Could not clear corrupted key:",
+                key,
+                removeError
+            );
+        }
+
+        return fallback;
+    }
+
+    if (Array.isArray(fallback) && !Array.isArray(parsed)) {
+
+        console.error(
+            `Saved HomeNest data (${key}) had an unexpected shape and was ignored.`
+        );
+
+        return fallback;
+    }
+
+    return parsed;
+}
+
+
+function writeStoredValue(key, value) {
+
+    try {
+        localStorage.setItem(key, value);
+        return true;
+    } catch (error) {
+        reportStorageError(
+            "HomeNest could not save your data in this browser. Storage may be full or blocked.",
+            error
+        );
+
+        return false;
+    }
+}
+
+
+function writeStoredJSON(key, value) {
+
+    let serialized = null;
+
+    try {
+        serialized = JSON.stringify(value);
+    } catch (error) {
+        reportStorageError(
+            "HomeNest could not prepare your data for saving.",
+            error
+        );
+
+        return false;
+    }
+
+    return writeStoredValue(key, serialized);
+}
+
+
+/* =========================================================
    LOAD SAVED PROPERTIES
 ========================================================= */
 
-try {
-    const savedProperties =
-        JSON.parse(localStorage.getItem("hnProperties") || "null");
+const savedProperties = readStoredJSON("hnProperties", null);
 
-    if (Array.isArray(savedProperties) && savedProperties.length) {
-        properties = savedProperties;
-    }
-} catch (error) {
-    console.error("Property loading error:", error);
+if (Array.isArray(savedProperties) && savedProperties.length) {
+    properties = savedProperties;
 }
 
 
@@ -195,20 +301,16 @@ try {
 let selectedProperty = null;
 let selectedMapProperty = null;
 
-let requests =
-    JSON.parse(localStorage.getItem("hnRequests") || "[]");
+let requests = readStoredJSON("hnRequests", []);
 
-let wishlist =
-    JSON.parse(localStorage.getItem("hnWishlist") || "[]");
+let wishlist = readStoredJSON("hnWishlist", []);
 
-let notifications =
-    JSON.parse(localStorage.getItem("hnNotifications") || "[]");
+let notifications = readStoredJSON("hnNotifications", []);
 
-let currentUser =
-    JSON.parse(localStorage.getItem("hnUser") || "null");
+let currentUser = readStoredJSON("hnUser", null);
 
 let currentLanguage =
-    localStorage.getItem("hnLanguage") || "en";
+    readStoredValue("hnLanguage") || "en";
 
 let userCoords = null;
 
@@ -219,61 +321,6 @@ let homeNestUserMarker = null;
 let homeNestPropertyMarker = null;
 let homeNestRouteLine = null;
 
-/* =========================================================
-   HOMENEST — LIVE BACKEND API
-   ========================================================= */
-
-const API_BASE_URL =
-    "https://homenest-backend-sable.vercel.app";
-
-
-/* =========================================================
-   API REQUEST HELPER
-   ========================================================= */
-
-async function apiRequest(
-    endpoint,
-    options = {}
-) {
-
-    const response =
-        await fetch(
-            API_BASE_URL + endpoint,
-            {
-                ...options,
-
-                headers: {
-                    "Content-Type":
-                        "application/json",
-
-                    ...(options.headers || {})
-                }
-            }
-        );
-
-    let data = null;
-
-    try {
-
-        data =
-            await response.json();
-
-    } catch (error) {
-
-        data = null;
-    }
-
-    if (!response.ok) {
-
-        throw new Error(
-            data?.error ||
-            data?.message ||
-            `API request failed: ${response.status}`
-        );
-    }
-
-    return data;
-}
 /* =========================================================
    TRANSLATIONS
 ========================================================= */
@@ -545,7 +592,7 @@ function applyLanguage() {
         }
     }
 
-    localStorage.setItem(
+    writeStoredValue(
         "hnLanguage",
         currentLanguage
     );
@@ -865,184 +912,236 @@ function toggleWishlist(id, button) {
         );
     }
 
-    localStorage.setItem(
+    writeStoredJSON(
         "hnWishlist",
-        JSON.stringify(wishlist)
+        wishlist
     );
 
     updateUserPortal();
 }
 
+/* =========================================================
+   HOMENEST — LIVE BACKEND API CONFIGURATION
+   Vercel Frontend → Vercel Backend → MongoDB Atlas
+   ========================================================= */
+
+const API_BASE_URL =
+    "https://homenest-backend-sable.vercel.app";
 
 
 /* =========================================================
-   LOAD PROPERTIES FROM LIVE MONGODB BACKEND
+   API HELPER
    ========================================================= */
 
-async function loadPropertiesFromBackend() {
+async function apiRequest(endpoint, options = {}) {
+
+    const url =
+        API_BASE_URL +
+        endpoint;
 
     try {
 
-        console.log(
-            "Loading properties from HomeNest backend..."
-        );
+        const response =
+            await fetch(url, {
 
-        const data =
-            await apiRequest(
-                "/api/properties"
-            );
+                ...options,
 
-        /*
-         * Backend may return:
-         *
-         * [
-         *   {...},
-         *   {...}
-         * ]
-         *
-         * OR
-         *
-         * {
-         *   properties: [...]
-         * }
-         */
+                headers: {
+                    "Content-Type":
+                        "application/json",
 
-        const backendProperties =
-            Array.isArray(data)
-                ? data
-                : Array.isArray(data?.properties)
-                    ? data.properties
-                    : [];
+                    ...(options.headers || {})
+                }
+            });
 
-        if (
-            backendProperties.length > 0
-        ) {
+        let data = null;
 
-            properties =
-                backendProperties.map(
-                    property => ({
-
-                        ...property,
-
-                        /*
-                         * Keep HomeNest frontend
-                         * compatibility.
-                         */
-
-                        id:
-                            property.id ||
-                            property._id,
-
-                        priceText:
-                            property.priceText ||
-                            property.price ||
-                            "Price on request",
-
-                        location:
-                            property.location ||
-                            property.city ||
-                            property.address ||
-                            "India",
-
-                        city:
-                            property.city ||
-                            (
-                                property.location
-                                    ? property.location
-                                        .split(",")[0]
-                                        .trim()
-                                    : ""
-                            ),
-
-                        bedrooms:
-                            Number(
-                                property.bedrooms || 0
-                            ),
-
-                        bathrooms:
-                            Number(
-                                property.bathrooms || 0
-                            ),
-
-                        rating:
-                            Number(
-                                property.rating || 0
-                            ),
-
-                        reviews:
-                            Number(
-                                property.reviews || 0
-                            )
-                    })
-                );
-
-            /*
-             * Keep localStorage updated so the
-             * existing HomeNest UI continues working.
-             */
-
-            localStorage.setItem(
-                "hnProperties",
-                JSON.stringify(properties)
-            );
-
-            console.log(
-                "HomeNest properties loaded:",
-                properties.length
-            );
-
-            /*
-             * Refresh existing HomeNest UI.
-             */
-
-            if (
-                typeof renderProperties ===
-                "function"
-            ) {
-                renderProperties();
-            }
-
-            if (
-                typeof renderMap ===
-                "function"
-            ) {
-                renderMap();
-            }
-
-            if (
-                typeof updateAdmin ===
-                "function"
-            ) {
-                updateAdmin();
-            }
-
-            return properties;
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = null;
         }
 
-        console.warn(
-            "Backend returned no properties."
-        );
+        if (!response.ok) {
 
-        return properties;
+            throw new Error(
+                data?.error ||
+                data?.message ||
+                `API request failed: ${response.status}`
+            );
+        }
+
+        return data;
 
     } catch (error) {
 
         console.error(
-            "Could not load properties from backend:",
+            "HomeNest API Error:",
             error
         );
 
-        showToast(
-            "Unable to load properties from server."
+        throw error;
+    }
+}
+
+
+
+
+
+/* =========================================================
+   FORMAT BACKEND PRICE (rupees) AS HOMENEST PRICE TEXT
+   ========================================================= */
+
+function formatIndianPrice(value) {
+
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return "Price on request";
+    }
+
+    if (amount >= 10000000) {
+        return "₹" +
+            (amount / 10000000).toFixed(2) +
+            " Cr";
+    }
+
+    if (amount >= 100000) {
+        return "₹" +
+            Math.round(amount / 100000) +
+            " Lakh";
+    }
+
+    return "₹" + amount.toLocaleString("en-IN");
+}
+
+
+/* =========================================================
+   MAP A BACKEND PROPERTY DOCUMENT TO THE UI SHAPE
+   ========================================================= */
+
+function mapBackendProperty(doc, id) {
+
+    const location =
+        doc.location ||
+        "India";
+
+    // Cards pass the id into inline onclick handlers as a bare
+    // value, so backend documents get a local numeric id and
+    // keep their Mongo id in backendId.
+    return {
+        id: id,
+        backendId: doc._id,
+        name: doc.title || "Property",
+        location: location,
+        city: String(location).split(",")[0].trim(),
+        type: doc.propertyType || "Property",
+        price: Number(doc.price) || 0,
+        priceText: formatIndianPrice(doc.price),
+        bedrooms: Number(doc.bedrooms) || 0,
+        bathrooms: Number(doc.bathrooms) || 0,
+        area: doc.area
+            ? `${doc.area} sq.ft`
+            : "N/A",
+        parking: "N/A",
+        furnishing: "N/A",
+        facing: "N/A",
+        image:
+            (Array.isArray(doc.images) && doc.images[0]) ||
+            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
+        amenities: "Security • Parking",
+        description:
+            doc.description ||
+            "No description available.",
+        rating: 5,
+        reviews: 0,
+        distance: "—"
+    };
+}
+
+
+/* =========================================================
+   LOAD PROPERTIES FROM BACKEND
+   The listings shown on the site must survive a backend or
+   database outage, so a failure only logs and keeps the
+   properties already loaded from the local catalogue.
+   ========================================================= */
+
+async function loadPropertiesFromBackend() {
+
+    let backendProperties = null;
+
+    try {
+
+        backendProperties =
+            await apiRequest("/api/properties");
+
+    } catch (error) {
+
+        console.error(
+            "Could not load properties from the backend, showing locally saved properties:",
+            error
         );
 
-        /*
-         * Keep existing local properties
-         * instead of breaking the website.
-         */
-
-        return properties;
+        return false;
     }
+
+    if (!Array.isArray(backendProperties)) {
+
+        console.error(
+            "Backend returned an unexpected properties payload:",
+            backendProperties
+        );
+
+        return false;
+    }
+
+    const existingBackendIds =
+        new Set(
+            properties
+                .map(property => property.backendId)
+                .filter(Boolean)
+        );
+
+    let nextId =
+        properties.reduce(
+            (highest, property) =>
+                Math.max(
+                    highest,
+                    Number(property.id) || 0
+                ),
+            0
+        );
+
+    const newProperties =
+        backendProperties
+            .filter(
+                doc =>
+                    doc &&
+                    doc._id &&
+                    !existingBackendIds.has(doc._id)
+            )
+            .map(doc => {
+
+                nextId += 1;
+
+                return mapBackendProperty(doc, nextId);
+            });
+
+    if (!newProperties.length) {
+        return true;
+    }
+
+    properties = [
+        ...newProperties,
+        ...properties
+    ];
+
+    renderProperties();
+    renderMap();
+    updateAdmin();
+
+    return true;
 }
 
 
@@ -1957,11 +2056,9 @@ window.getCurrentLocation =
                     longitude
                 ];
 
-                localStorage.setItem(
+                writeStoredJSON(
                     "hnUserCoords",
-                    JSON.stringify(
-                        userCoords
-                    )
+                    userCoords
                 );
 
                 const currentLocation = {
@@ -2467,12 +2564,12 @@ function login() {
                 "pratiksha@214"
         ) {
 
-            localStorage.setItem(
+            writeStoredValue(
                 "hnAdminLoggedIn",
                 "true"
             );
 
-            localStorage.setItem(
+            writeStoredValue(
                 "hnAdminEmail",
                 email
             );
@@ -2532,11 +2629,9 @@ function login() {
             email
     };
 
-    localStorage.setItem(
+    writeStoredJSON(
         "hnUser",
-        JSON.stringify(
-            currentUser
-        )
+        currentUser
     );
 
     closeModal(
@@ -2560,7 +2655,7 @@ function login() {
 function isAdminLoggedIn() {
 
     return (
-        localStorage.getItem(
+        readStoredValue(
             "hnAdminLoggedIn"
         ) === "true"
     );
@@ -2985,6 +3080,29 @@ function deleteProperty(id) {
         return;
     }
 
+    const property =
+        properties.find(
+            p => p.id == id
+        );
+
+    // Properties that came from the API must also be removed
+    // there, otherwise they come back on the next page load.
+    if (property && property.backendId) {
+
+        deletePropertyFromBackend(property.backendId)
+            .catch(error => {
+
+                console.error(
+                    "Could not delete the property on the backend:",
+                    error
+                );
+
+                showToast(
+                    "Removed locally, but the server could not be updated."
+                );
+            });
+    }
+
     properties =
         properties.filter(
             property =>
@@ -3186,9 +3304,9 @@ async function changeRequestStatus(id, status) {
 
     request.status = status;
 
-    localStorage.setItem(
+    writeStoredJSON(
         "hnRequests",
-        JSON.stringify(requests)
+        requests
     );
 
     let text = "";
@@ -3226,9 +3344,9 @@ async function changeRequestStatus(id, status) {
             new Date().toLocaleString()
     });
 
-    localStorage.setItem(
+    writeStoredJSON(
         "hnNotifications",
-        JSON.stringify(notifications)
+        notifications
     );
 
        // ========================================================
@@ -4163,33 +4281,27 @@ function setText(
 
 function saveProperties() {
 
-    localStorage.setItem(
+    return writeStoredJSON(
         "hnProperties",
-        JSON.stringify(
-            properties
-        )
+        properties
     );
 }
 
 
 function saveRequests() {
 
-    localStorage.setItem(
+    return writeStoredJSON(
         "hnRequests",
-        JSON.stringify(
-            requests
-        )
+        requests
     );
 }
 
 
 function saveNotifications() {
 
-    localStorage.setItem(
+    return writeStoredJSON(
         "hnNotifications",
-        JSON.stringify(
-            notifications
-        )
+        notifications
     );
 }
 
@@ -4273,29 +4385,69 @@ document.addEventListener(
    INITIALIZE
 ========================================================= */
 
+/* =========================================================
+   GLOBAL FAILURE REPORTING
+   Async click handlers reject silently otherwise.
+========================================================= */
+
+window.addEventListener(
+    "unhandledrejection",
+    event => {
+
+        console.error(
+            "Unhandled promise rejection:",
+            event.reason
+        );
+    }
+);
+
+
+function runStartupStep(name, step) {
+
+    try {
+        step();
+    } catch (error) {
+        console.error(
+            `HomeNest startup step failed: ${name}`,
+            error
+        );
+    }
+}
+
+
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        applyLanguage();
+        // Each step is isolated so one failing section cannot
+        // stop the rest of the page from rendering.
+        runStartupStep("applyLanguage", applyLanguage);
 
-        renderProperties();
+        runStartupStep("renderProperties", renderProperties);
 
-        renderMap();
+        runStartupStep("renderMap", renderMap);
 
-        updateUserPortal();
+        runStartupStep("updateUserPortal", updateUserPortal);
 
-        updateAdmin();
+        runStartupStep("updateAdmin", updateAdmin);
 
-        loadPropertiesFromBackend();
+        runStartupStep("loadPropertiesFromBackend", () => {
 
-        try {
+            loadPropertiesFromBackend()
+                .catch(error => {
+                    console.error(
+                        "Backend property load failed:",
+                        error
+                    );
+                });
+        });
+
+        runStartupStep("restoreLocation", () => {
 
             const savedCoords =
-                JSON.parse(
-                    localStorage.getItem(
-                        "hnUserCoords"
-                    ) || "null"
+                readStoredJSON(
+                    "hnUserCoords",
+                    null
                 );
 
             if (
@@ -4309,14 +4461,7 @@ document.addEventListener(
 
                 updateMapDistances();
             }
-
-        } catch (error) {
-
-            console.error(
-                "Location restore error:",
-                error
-            );
-        }
+        });
 
         document
             .querySelectorAll(
@@ -4382,11 +4527,7 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        if (
-            localStorage.getItem(
-                "hnAdminLoggedIn"
-            ) === "true"
-        ) {
+        if (isAdminLoggedIn()) {
 
             document
                 .getElementById(
@@ -4414,7 +4555,7 @@ window.addEventListener(
             () => {
 
                 const saved =
-                    localStorage.getItem(
+                    readStoredValue(
                         "hnLanguage"
                     );
 
@@ -4455,25 +4596,7 @@ if (typeof window.renderAdminUsers !== "function") {
         }
 
         // Get users safely
-        let users = [];
-
-        try {
-            users =
-                JSON.parse(
-                    localStorage.getItem("hnUsers") || "[]"
-                );
-        } catch (error) {
-            console.error(
-                "Could not load HomeNest users:",
-                error
-            );
-
-            users = [];
-        }
-
-        if (!Array.isArray(users)) {
-            users = [];
-        }
+        const users = readStoredJSON("hnUsers", []);
 
         if (users.length === 0) {
 
