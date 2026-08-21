@@ -39,9 +39,15 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Fully Furnished",
         facing: "East",
-        image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=85",
         amenities: "Swimming Pool • Gym • 24×7 Security • Garden • CCTV • Power Backup",
-        description: "A premium family villa in Whitefield with spacious rooms, modern interiors, excellent connectivity and peaceful surroundings.",
+        description:
+            "Set in one of Whitefield's calmest gated pockets, this 4 BHK garden villa opens into a double-height living hall filled with natural light. " +
+            "The Italian-marble ground floor carries an open modular kitchen, a formal dining space and a guest bedroom with attached bath. " +
+            "Upstairs, the master suite has a walk-in wardrobe, a private balcony and a clear view over the landscaped garden and swimming pool. " +
+            "The home comes fully furnished with modular wardrobes, air conditioning, geysers and a full-house inverter backup. " +
+            "ITPL, Phoenix Marketcity, Columbia Asia Hospital and leading international schools are all within a 10-minute drive. " +
+            "A rare, ready-to-move family villa that combines resort-style amenities with genuine tech-corridor connectivity.",
         rating: 4.9,
         reviews: 128,
         distance: "2.4 km",
@@ -63,9 +69,15 @@ let properties = [
         parking: "1 Car",
         furnishing: "Semi Furnished",
         facing: "West",
-        image: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=85",
         amenities: "Lift • Gym • Security • Parking • Club House • CCTV",
-        description: "A modern apartment in Baner designed for comfortable urban living with excellent connectivity to offices and schools.",
+        description:
+            "A bright 3 BHK on a high floor in Baner, planned so that every bedroom gets a window and cross ventilation. " +
+            "The living room extends into a wide sit-out balcony that looks towards the Baner hill greenery and the evening city skyline. " +
+            "A semi-modular kitchen with a dedicated utility area, vitrified flooring and premium bath fittings keep daily living effortless. " +
+            "The society offers a clubhouse, gymnasium, children's play area, covered parking, lift access and round-the-clock CCTV security. " +
+            "Balewadi High Street, Hinjewadi IT Park, Symbiosis and Mumbai-Pune Expressway access are all minutes away. " +
+            "Ideal for working professionals and young families who want a low-maintenance premium home in west Pune.",
         rating: 4.8,
         reviews: 94,
         distance: "4.8 km",
@@ -87,9 +99,15 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Semi Furnished",
         facing: "North",
-        image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=85",
         amenities: "Garden • Parking • CCTV • Security • Power Backup",
-        description: "A spacious independent family home located in a well-connected residential neighbourhood of Belagavi.",
+        description:
+            "A well-built independent house in the established residential heart of Tilakwadi, Belagavi, on a clean north-facing plot. " +
+            "The ground floor holds a large hall, a pooja space, a spacious kitchen with store room and two comfortable bedrooms. " +
+            "The first floor adds two more bedrooms and an open terrace that is perfect for family gatherings and evening tea. " +
+            "A private garden, covered parking for two cars, a borewell with municipal water and CCTV at the gate come included. " +
+            "Schools, colleges, the vegetable market, hospitals and the railway station are all within a short 5-10 minute drive. " +
+            "A genuine value buy for a joint family that prefers independent living over apartment life.", 
         rating: 4.7,
         reviews: 76,
         distance: "7.2 km",
@@ -111,9 +129,15 @@ let properties = [
         parking: "1 Car",
         furnishing: "Fully Furnished",
         facing: "East",
-        image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=85",
         amenities: "Lift • Gym • Pool • Security • Club House • Parking",
-        description: "A stylish city residence in Andheri West offering premium amenities and convenient access to Mumbai's major locations.",
+        description:
+            "A stylish 3 BHK sky residence in the heart of Andheri West, finished with imported marble flooring and designer lighting. " +
+            "Floor-to-ceiling windows in the living room frame a wide skyline view, while the deck balcony catches the evening sea breeze. " +
+            "The apartment is handed over fully furnished with a modular kitchen, chimney, hob, wardrobes, ACs and a smart entry lock. " +
+            "Tower amenities include a rooftop swimming pool, a fully equipped gym, a club house, high-speed lifts and three-tier security. " +
+            "Andheri Metro, the Western Express Highway, Infiniti Mall, Lokhandwala market and the domestic airport are all a short ride away. " +
+            "A premium, rent-ready address for buyers who want central Mumbai convenience without compromising on comfort.", 
         rating: 4.9,
         reviews: 212,
         distance: "8.3 km",
@@ -135,9 +159,15 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Fully Furnished",
         facing: "South",
-        image: "https://images.unsplash.com/photo-1600047509782-20d39509f26d?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=85",
         amenities: "Smart Home • Pool • Gym • Security • Garden • Parking",
-        description: "A modern smart villa close to Gachibowli's technology and business district.",
+        description:
+            "A contemporary 4 BHK smart villa in Gachibowli, built across three levels with clean lines and generous open spaces. " +
+            "Lighting, air conditioning, the main door lock and CCTV are all app-controlled through a single home-automation panel. " +
+            "The living and dining area flows out to a private deck with a plunge pool and a landscaped lawn for weekend evenings. " +
+            "All four bedrooms are en-suite and fully furnished, with a home-office nook and a separate home-theatre room on the top floor. " +
+            "Financial District, Wipro Circle, ISB, DLF Cyber City and the ORR ramp are within a comfortable 10-minute commute. " +
+            "Perfect for senior IT professionals and entrepreneurs looking for a future-ready villa in west Hyderabad.", 
         rating: 4.8,
         reviews: 109,
         distance: "9.1 km",
@@ -159,9 +189,15 @@ let properties = [
         parking: "2 Cars",
         furnishing: "Unfurnished",
         facing: "West",
-        image: "https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1200&q=85",
+        image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1200&q=85",
         amenities: "Parking • Garden • Security • Water Supply",
-        description: "A spacious home suitable for families looking for comfortable living in Bagalkot.",
+        description:
+            "A spacious 3 BHK independent home in a peaceful Bagalkot locality, built on a clear-title west-facing plot. " +
+            "Large windows and high ceilings keep the rooms naturally cool and bright through the Karnataka summer. " +
+            "The layout offers a wide hall, a separate dining space, a big kitchen with utility and two attached bathrooms. " +
+            "Outside there is a fenced garden, covered parking for two vehicles, a water sump and 24-hour municipal water supply. " +
+            "Schools, the bus stand, banks, temples and the district hospital are all within easy reach of the colony. " +
+            "An affordable, low-maintenance family home that is ready to move in without any additional construction work.", 
         rating: 4.8,
         reviews: 58,
         distance: "6.5 km",
@@ -172,125 +208,38 @@ let properties = [
 
 
 /* =========================================================
-   LOCAL STORAGE HELPERS
-   Storage can throw (corrupt JSON, exceeded quota, disabled
-   storage). Reads fall back to a known-good value and writes
-   report the failure instead of failing silently.
-========================================================= */
-
-function reportStorageError(message, error) {
-
-    console.error(message, error);
-
-    if (typeof showToast === "function") {
-        showToast(message);
-    }
-}
-
-
-function readStoredValue(key) {
-
-    try {
-        return localStorage.getItem(key);
-    } catch (error) {
-        console.error(
-            "Could not read stored key:",
-            key,
-            error
-        );
-
-        return null;
-    }
-}
-
-
-function readStoredJSON(key, fallback) {
-
-    const raw = readStoredValue(key);
-
-    if (raw === null) {
-        return fallback;
-    }
-
-    let parsed = null;
-
-    try {
-        parsed = JSON.parse(raw);
-    } catch (error) {
-        reportStorageError(
-            `Saved HomeNest data (${key}) was corrupted and has been reset.`,
-            error
-        );
-
-        try {
-            localStorage.removeItem(key);
-        } catch (removeError) {
-            console.error(
-                "Could not clear corrupted key:",
-                key,
-                removeError
-            );
-        }
-
-        return fallback;
-    }
-
-    if (Array.isArray(fallback) && !Array.isArray(parsed)) {
-
-        console.error(
-            `Saved HomeNest data (${key}) had an unexpected shape and was ignored.`
-        );
-
-        return fallback;
-    }
-
-    return parsed;
-}
-
-
-function writeStoredValue(key, value) {
-
-    try {
-        localStorage.setItem(key, value);
-        return true;
-    } catch (error) {
-        reportStorageError(
-            "HomeNest could not save your data in this browser. Storage may be full or blocked.",
-            error
-        );
-
-        return false;
-    }
-}
-
-
-function writeStoredJSON(key, value) {
-
-    let serialized = null;
-
-    try {
-        serialized = JSON.stringify(value);
-    } catch (error) {
-        reportStorageError(
-            "HomeNest could not prepare your data for saving.",
-            error
-        );
-
-        return false;
-    }
-
-    return writeStoredValue(key, serialized);
-}
-
-
-/* =========================================================
    LOAD SAVED PROPERTIES
 ========================================================= */
 
-const savedProperties = readStoredJSON("hnProperties", null);
+try {
+    const savedProperties =
+        JSON.parse(localStorage.getItem("hnProperties") || "null");
 
-if (Array.isArray(savedProperties) && savedProperties.length) {
-    properties = savedProperties;
+    const usableProperties =
+        Array.isArray(savedProperties)
+            ? savedProperties.filter(
+                property =>
+                    property &&
+                    property.name &&
+                    property.image &&
+                    property.priceText &&
+                    !/^\d{5,}$/.test(String(property.price || ""))
+            )
+            : [];
+
+    if (usableProperties.length) {
+        properties = usableProperties;
+    } else if (Array.isArray(savedProperties) && savedProperties.length) {
+        localStorage.removeItem("hnProperties");
+    }
+} catch (error) {
+    console.error("Property loading error:", error);
+
+    try {
+        localStorage.removeItem("hnProperties");
+    } catch (removeError) {
+        console.error("Could not clear saved properties:", removeError);
+    }
 }
 
 
@@ -301,16 +250,20 @@ if (Array.isArray(savedProperties) && savedProperties.length) {
 let selectedProperty = null;
 let selectedMapProperty = null;
 
-let requests = readStoredJSON("hnRequests", []);
+let requests =
+    JSON.parse(localStorage.getItem("hnRequests") || "[]");
 
-let wishlist = readStoredJSON("hnWishlist", []);
+let wishlist =
+    JSON.parse(localStorage.getItem("hnWishlist") || "[]");
 
-let notifications = readStoredJSON("hnNotifications", []);
+let notifications =
+    JSON.parse(localStorage.getItem("hnNotifications") || "[]");
 
-let currentUser = readStoredJSON("hnUser", null);
+let currentUser =
+    JSON.parse(localStorage.getItem("hnUser") || "null");
 
 let currentLanguage =
-    readStoredValue("hnLanguage") || "en";
+    localStorage.getItem("hnLanguage") || "en";
 
 let userCoords = null;
 
@@ -320,6 +273,113 @@ let homeNestDirectionsRenderer = null;
 let homeNestUserMarker = null;
 let homeNestPropertyMarker = null;
 let homeNestRouteLine = null;
+
+
+/* =========================================================
+   BACKEND API (email + AI only, catalogue stays local)
+========================================================= */
+
+const HOMENEST_API_BASE =
+    "https://homenest-backend-sable.vercel.app";
+
+async function homeNestApi(path, body) {
+
+    const response =
+        await fetch(
+            HOMENEST_API_BASE + path,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            }
+        );
+
+    const raw =
+        await response.text();
+
+    let data = null;
+
+    try {
+        data = raw ? JSON.parse(raw) : null;
+    } catch (error) {
+        console.error(
+            "Non-JSON response from " + path + ":",
+            raw
+        );
+    }
+
+    if (!response.ok) {
+
+        const message =
+            (data && (data.message || data.error)) ||
+            ("Request failed with status " + response.status);
+
+        const failure = new Error(message);
+        failure.status = response.status;
+
+        throw failure;
+    }
+
+    return data || {};
+}
+
+
+/* =========================================================
+   LOCAL USER ACCOUNTS (email + password validation)
+========================================================= */
+
+function loadAccounts() {
+
+    try {
+
+        const saved =
+            JSON.parse(
+                localStorage.getItem("hnAccounts") || "{}"
+            );
+
+        return (saved && typeof saved === "object")
+            ? saved
+            : {};
+
+    } catch (error) {
+
+        console.error("Account loading error:", error);
+
+        try {
+            localStorage.removeItem("hnAccounts");
+        } catch (removeError) {
+            console.error(
+                "Could not clear accounts:",
+                removeError
+            );
+        }
+
+        return {};
+    }
+}
+
+
+function saveAccounts(accounts) {
+
+    try {
+
+        localStorage.setItem(
+            "hnAccounts",
+            JSON.stringify(accounts)
+        );
+
+    } catch (error) {
+
+        console.error("Account saving error:", error);
+
+        showToast(
+            "Your browser blocked saving the account details."
+        );
+    }
+}
+
 
 /* =========================================================
    TRANSLATIONS
@@ -592,7 +652,7 @@ function applyLanguage() {
         }
     }
 
-    writeStoredValue(
+    localStorage.setItem(
         "hnLanguage",
         currentLanguage
     );
@@ -912,381 +972,12 @@ function toggleWishlist(id, button) {
         );
     }
 
-    writeStoredJSON(
+    localStorage.setItem(
         "hnWishlist",
-        wishlist
+        JSON.stringify(wishlist)
     );
 
     updateUserPortal();
-}
-
-/* =========================================================
-   HOMENEST — LIVE BACKEND API CONFIGURATION
-   Vercel Frontend → Vercel Backend → MongoDB Atlas
-   ========================================================= */
-
-const API_BASE_URL =
-    "https://homenest-backend-sable.vercel.app";
-
-
-/* =========================================================
-   API HELPER
-   ========================================================= */
-
-async function apiRequest(endpoint, options = {}) {
-
-    const url =
-        API_BASE_URL +
-        endpoint;
-
-    try {
-
-        const response =
-            await fetch(url, {
-
-                ...options,
-
-                headers: {
-                    "Content-Type":
-                        "application/json",
-
-                    ...(options.headers || {})
-                }
-            });
-
-        let data = null;
-
-        try {
-            data = await response.json();
-        } catch (error) {
-            data = null;
-        }
-
-        if (!response.ok) {
-
-            throw new Error(
-                data?.error ||
-                data?.message ||
-                `API request failed: ${response.status}`
-            );
-        }
-
-        return data;
-
-    } catch (error) {
-
-        console.error(
-            "HomeNest API Error:",
-            error
-        );
-
-        throw error;
-    }
-}
-
-
-
-
-
-/* =========================================================
-   FORMAT BACKEND PRICE (rupees) AS HOMENEST PRICE TEXT
-   ========================================================= */
-
-function formatIndianPrice(value) {
-
-    const amount = Number(value);
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return "Price on request";
-    }
-
-    if (amount >= 10000000) {
-        return "₹" +
-            (amount / 10000000).toFixed(2) +
-            " Cr";
-    }
-
-    if (amount >= 100000) {
-        return "₹" +
-            Math.round(amount / 100000) +
-            " Lakh";
-    }
-
-    return "₹" + amount.toLocaleString("en-IN");
-}
-
-
-/* =========================================================
-   MAP A BACKEND PROPERTY DOCUMENT TO THE UI SHAPE
-   ========================================================= */
-
-function mapBackendProperty(doc, id) {
-
-    const location =
-        doc.location ||
-        "India";
-
-    // Cards pass the id into inline onclick handlers as a bare
-    // value, so backend documents get a local numeric id and
-    // keep their Mongo id in backendId.
-    return {
-        id: id,
-        backendId: doc._id,
-        name: doc.title || "Property",
-        location: location,
-        city: String(location).split(",")[0].trim(),
-        type: doc.propertyType || "Property",
-        price: Number(doc.price) || 0,
-        priceText: formatIndianPrice(doc.price),
-        bedrooms: Number(doc.bedrooms) || 0,
-        bathrooms: Number(doc.bathrooms) || 0,
-        area: doc.area
-            ? `${doc.area} sq.ft`
-            : "N/A",
-        parking: "N/A",
-        furnishing: "N/A",
-        facing: "N/A",
-        image:
-            (Array.isArray(doc.images) && doc.images[0]) ||
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
-        amenities: "Security • Parking",
-        description:
-            doc.description ||
-            "No description available.",
-        rating: 5,
-        reviews: 0,
-        distance: "—"
-    };
-}
-
-
-/* =========================================================
-   LOAD PROPERTIES FROM BACKEND
-   The listings shown on the site must survive a backend or
-   database outage, so a failure only logs and keeps the
-   properties already loaded from the local catalogue.
-   ========================================================= */
-
-async function loadPropertiesFromBackend() {
-
-    let backendProperties = null;
-
-    try {
-
-        backendProperties =
-            await apiRequest("/api/properties");
-
-    } catch (error) {
-
-        console.error(
-            "Could not load properties from the backend, showing locally saved properties:",
-            error
-        );
-
-        return false;
-    }
-
-    if (!Array.isArray(backendProperties)) {
-
-        console.error(
-            "Backend returned an unexpected properties payload:",
-            backendProperties
-        );
-
-        return false;
-    }
-
-    const existingBackendIds =
-        new Set(
-            properties
-                .map(property => property.backendId)
-                .filter(Boolean)
-        );
-
-    let nextId =
-        properties.reduce(
-            (highest, property) =>
-                Math.max(
-                    highest,
-                    Number(property.id) || 0
-                ),
-            0
-        );
-
-    const newProperties =
-        backendProperties
-            .filter(
-                doc =>
-                    doc &&
-                    doc._id &&
-                    !existingBackendIds.has(doc._id)
-            )
-            .map(doc => {
-
-                nextId += 1;
-
-                return mapBackendProperty(doc, nextId);
-            });
-
-    if (!newProperties.length) {
-        return true;
-    }
-
-    properties = [
-        ...newProperties,
-        ...properties
-    ];
-
-    renderProperties();
-    renderMap();
-    updateAdmin();
-
-    return true;
-}
-
-
-/* =========================================================
-   CREATE PROPERTY
-   ========================================================= */
-
-async function createPropertyOnBackend(
-    property
-) {
-
-    return await apiRequest(
-        "/api/properties",
-        {
-            method: "POST",
-
-            body: JSON.stringify(
-                property
-            )
-        }
-    );
-}
-
-
-/* =========================================================
-   UPDATE PROPERTY
-   ========================================================= */
-
-async function updatePropertyOnBackend(
-    id,
-    property
-) {
-
-    return await apiRequest(
-        "/api/properties/" +
-        encodeURIComponent(id),
-
-        {
-            method: "PUT",
-
-            body: JSON.stringify(
-                property
-            )
-        }
-    );
-}
-
-
-/* =========================================================
-   DELETE PROPERTY
-   ========================================================= */
-
-async function deletePropertyFromBackend(
-    id
-) {
-
-    return await apiRequest(
-        "/api/properties/" +
-        encodeURIComponent(id),
-
-        {
-            method: "DELETE"
-        }
-    );
-}
-
-
-/* =========================================================
-   EMAIL — PROPERTY CONFIRMED
-   ========================================================= */
-
-async function sendPropertyConfirmationEmail(
-    request
-) {
-
-    if (
-        !request ||
-        !request.userEmail
-    ) {
-
-        return null;
-    }
-
-    return await apiRequest(
-        "/api/email/property-confirmed",
-
-        {
-            method: "POST",
-
-            body: JSON.stringify({
-
-                userEmail:
-                    request.userEmail,
-
-                userName:
-                    request.userName ||
-                    "HomeNest User",
-
-                propertyName:
-                    request.propertyName,
-
-                location:
-                    request.location ||
-                    ""
-            })
-        }
-    );
-}
-
-
-/* =========================================================
-   AI PROPERTY CHAT
-   ========================================================= */
-
-async function askPropertyAI(
-    message
-) {
-
-    return await apiRequest(
-        "/api/ai/chat",
-
-        {
-            method: "POST",
-
-            body: JSON.stringify({
-
-                message:
-
-                    message,
-
-                property:
-                    selectedProperty ||
-                    null,
-
-                properties:
-                    properties,
-
-                history:
-                    typeof aiConversation !==
-                    "undefined"
-                        ? aiConversation.slice(-10)
-                        : []
-            })
-        }
-    );
 }
 
 // ============================================================
@@ -2056,9 +1747,11 @@ window.getCurrentLocation =
                     longitude
                 ];
 
-                writeStoredJSON(
+                localStorage.setItem(
                     "hnUserCoords",
-                    userCoords
+                    JSON.stringify(
+                        userCoords
+                    )
                 );
 
                 const currentLocation = {
@@ -2413,7 +2106,7 @@ function requestProperty(id) {
         return;
     }
 
-    createRequest();
+    openRequestForm();
 }
 
 
@@ -2432,11 +2125,26 @@ function requestSelectedProperty() {
         "propertyModal"
     );
 
-    createRequest();
+    if (!currentUser) {
+
+        openLogin();
+
+        showToast(
+            "Please login as a user first."
+        );
+
+        return;
+    }
+
+    openRequestForm();
 }
 
 
-function createRequest() {
+/* =========================================================
+   REQUEST FORM — name, contact, email, password, address
+========================================================= */
+
+function openRequestForm() {
 
     if (
         !selectedProperty ||
@@ -2444,6 +2152,242 @@ function createRequest() {
     ) {
         return;
     }
+
+    closeRequestForm();
+
+    const accounts =
+        loadAccounts();
+
+    const account =
+        accounts[currentUser.email] || {};
+
+    const overlay =
+        document.createElement("div");
+
+    overlay.id = "hnRequestForm";
+
+    overlay.style.cssText =
+        "position:fixed;inset:0;background:rgba(10,15,25,.65);" +
+        "z-index:99998;display:flex;align-items:center;" +
+        "justify-content:center;padding:18px;overflow:auto;";
+
+    overlay.innerHTML =
+        `<div style="background:#fff;color:#172033;max-width:430px;
+            width:100%;border-radius:18px;padding:24px;
+            box-shadow:0 25px 60px rgba(0,0,0,.35);
+            font-family:inherit;max-height:92vh;overflow:auto;">
+
+            <h3 style="margin:0 0 4px;font-size:18px;">
+                📋 Property Request
+            </h3>
+
+            <p style="margin:0 0 16px;font-size:12px;color:#5a6478;">
+                ${escapeHTML(selectedProperty.name)} —
+                ${escapeHTML(selectedProperty.location)}
+            </p>
+
+            <label style="font-size:11px;font-weight:700;">
+                Full Name
+            </label>
+            <input id="hnReqName" type="text"
+                value="${escapeHTML(account.name || currentUser.name || "")}"
+                placeholder="Your full name"
+                style="width:100%;padding:10px;margin:5px 0 12px;
+                border:1px solid #d9dee8;border-radius:10px;font-size:13px;">
+
+            <label style="font-size:11px;font-weight:700;">
+                Contact Number
+            </label>
+            <input id="hnReqPhone" type="tel"
+                value="${escapeHTML(account.phone || "")}"
+                placeholder="10-digit mobile number"
+                style="width:100%;padding:10px;margin:5px 0 12px;
+                border:1px solid #d9dee8;border-radius:10px;font-size:13px;">
+
+            <label style="font-size:11px;font-weight:700;">
+                Email Address
+            </label>
+            <input id="hnReqEmail" type="email"
+                value="${escapeHTML(currentUser.email || "")}"
+                placeholder="you@example.com"
+                style="width:100%;padding:10px;margin:5px 0 12px;
+                border:1px solid #d9dee8;border-radius:10px;font-size:13px;">
+
+            <label style="font-size:11px;font-weight:700;">
+                Password (confirm your account)
+            </label>
+            <input id="hnReqPassword" type="password"
+                placeholder="Your login password"
+                style="width:100%;padding:10px;margin:5px 0 12px;
+                border:1px solid #d9dee8;border-radius:10px;font-size:13px;">
+
+            <label style="font-size:11px;font-weight:700;">
+                Address
+            </label>
+            <textarea id="hnReqAddress" rows="3"
+                placeholder="House / street / city / pincode"
+                style="width:100%;padding:10px;margin:5px 0 16px;
+                border:1px solid #d9dee8;border-radius:10px;
+                font-size:13px;resize:vertical;">${escapeHTML(account.address || "")}</textarea>
+
+            <div style="display:flex;gap:10px;">
+
+                <button onclick="submitRequestForm()"
+                    style="flex:1;padding:12px;border:0;border-radius:10px;
+                    background:#172033;color:#fff;font-weight:700;
+                    font-size:13px;cursor:pointer;">
+                    Send Request
+                </button>
+
+                <button onclick="closeRequestForm()"
+                    style="flex:1;padding:12px;border:1px solid #d9dee8;
+                    border-radius:10px;background:#fff;color:#172033;
+                    font-weight:700;font-size:13px;cursor:pointer;">
+                    Cancel
+                </button>
+
+            </div>
+
+        </div>`;
+
+    document.body.appendChild(overlay);
+
+    document
+        .getElementById("hnReqName")
+        ?.focus();
+}
+
+
+function closeRequestForm() {
+
+    document
+        .getElementById("hnRequestForm")
+        ?.remove();
+}
+
+
+function submitRequestForm() {
+
+    if (
+        !selectedProperty ||
+        !currentUser
+    ) {
+
+        closeRequestForm();
+
+        return;
+    }
+
+    const name =
+        document.getElementById("hnReqName")?.value.trim() || "";
+
+    const phone =
+        document.getElementById("hnReqPhone")?.value.trim() || "";
+
+    const email =
+        (document.getElementById("hnReqEmail")?.value || "")
+            .trim()
+            .toLowerCase();
+
+    const password =
+        document.getElementById("hnReqPassword")?.value || "";
+
+    const address =
+        document.getElementById("hnReqAddress")?.value.trim() || "";
+
+    if (!name || !phone || !email || !address) {
+
+        showToast(
+            "Please fill your name, contact number, email and address."
+        );
+
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+
+        showToast(
+            "Invalid email address. Please check and try again."
+        );
+
+        return;
+    }
+
+    if (!/^[0-9+\-\s]{10,15}$/.test(phone)) {
+
+        showToast(
+            "Please enter a valid contact number."
+        );
+
+        return;
+    }
+
+    const accounts =
+        loadAccounts();
+
+    const account =
+        accounts[currentUser.email];
+
+    if (
+        account &&
+        account.password &&
+        account.password !== password
+    ) {
+
+        showToast(
+            "❌ Invalid password. Please enter your correct password."
+        );
+
+        return;
+    }
+
+    if (account) {
+
+        account.name = name;
+        account.phone = phone;
+        account.address = address;
+
+        saveAccounts(accounts);
+    }
+
+    currentUser.name = name;
+    currentUser.phone = phone;
+    currentUser.address = address;
+
+    try {
+
+        localStorage.setItem(
+            "hnUser",
+            JSON.stringify(currentUser)
+        );
+
+    } catch (error) {
+
+        console.error("Could not save user:", error);
+    }
+
+    closeRequestForm();
+
+    createRequest({
+        userName: name,
+        userPhone: phone,
+        userEmail: email,
+        userAddress: address
+    });
+}
+
+
+function createRequest(details) {
+
+    if (
+        !selectedProperty ||
+        !currentUser
+    ) {
+        return;
+    }
+
+    const info =
+        details || {};
 
     const existing =
         requests.find(
@@ -2481,11 +2425,21 @@ function createRequest() {
             selectedProperty.location,
 
         userName:
+            info.userName ||
             currentUser.name ||
             "HomeNest User",
 
         userEmail:
+            info.userEmail ||
             currentUser.email,
+
+        userPhone:
+            info.userPhone ||
+            currentUser.phone || "",
+
+        userAddress:
+            info.userAddress ||
+            currentUser.address || "",
 
         status:
             "pending",
@@ -2564,12 +2518,12 @@ function login() {
                 "pratiksha@214"
         ) {
 
-            writeStoredValue(
+            localStorage.setItem(
                 "hnAdminLoggedIn",
                 "true"
             );
 
-            writeStoredValue(
+            localStorage.setItem(
                 "hnAdminEmail",
                 email
             );
@@ -2611,6 +2565,15 @@ function login() {
         return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+
+        showToast(
+            "Invalid email address. Please check and try again."
+        );
+
+        return;
+    }
+
     if (password.length < 5) {
 
         showToast(
@@ -2620,18 +2583,66 @@ function login() {
         return;
     }
 
+    const accounts =
+        loadAccounts();
+
+    const account =
+        accounts[email];
+
+    if (account) {
+
+        if (account.password !== password) {
+
+            showToast(
+                "❌ Invalid password. Please enter the correct password."
+            );
+
+            return;
+        }
+
+    } else {
+
+        accounts[email] = {
+            name: email.split("@")[0],
+            email: email,
+            password: password,
+            phone: "",
+            address: ""
+        };
+
+        saveAccounts(accounts);
+
+        showToast(
+            "New HomeNest account created for " +
+            email +
+            "."
+        );
+    }
+
     currentUser = {
 
         name:
+            (accounts[email] &&
+             accounts[email].name) ||
             email.split("@")[0],
 
         email:
-            email
+            email,
+
+        phone:
+            (accounts[email] &&
+             accounts[email].phone) || "",
+
+        address:
+            (accounts[email] &&
+             accounts[email].address) || ""
     };
 
-    writeStoredJSON(
+    localStorage.setItem(
         "hnUser",
-        currentUser
+        JSON.stringify(
+            currentUser
+        )
     );
 
     closeModal(
@@ -2655,7 +2666,7 @@ function login() {
 function isAdminLoggedIn() {
 
     return (
-        readStoredValue(
+        localStorage.getItem(
             "hnAdminLoggedIn"
         ) === "true"
     );
@@ -3080,29 +3091,6 @@ function deleteProperty(id) {
         return;
     }
 
-    const property =
-        properties.find(
-            p => p.id == id
-        );
-
-    // Properties that came from the API must also be removed
-    // there, otherwise they come back on the next page load.
-    if (property && property.backendId) {
-
-        deletePropertyFromBackend(property.backendId)
-            .catch(error => {
-
-                console.error(
-                    "Could not delete the property on the backend:",
-                    error
-                );
-
-                showToast(
-                    "Removed locally, but the server could not be updated."
-                );
-            });
-    }
-
     properties =
         properties.filter(
             property =>
@@ -3223,9 +3211,25 @@ function renderAdminRequests() {
                         </strong>
                         <br>
                         <small>
-                            ${escapeHTML(
+                            📧 ${escapeHTML(
                                 request.userEmail
                             )}
+                        </small>
+                        <br>
+                        <small>
+                            📞 ${escapeHTML(
+                                request.userPhone || "Not provided"
+                            )}
+                        </small>
+                        <br>
+                        <small>
+                            🏠 ${escapeHTML(
+                                request.userAddress || "Not provided"
+                            )}
+                        </small>
+                        <br>
+                        <small>
+                            🔑 Password verified
                         </small>
                     </td>
 
@@ -3304,9 +3308,9 @@ async function changeRequestStatus(id, status) {
 
     request.status = status;
 
-    writeStoredJSON(
+    localStorage.setItem(
         "hnRequests",
-        requests
+        JSON.stringify(requests)
     );
 
     let text = "";
@@ -3344,13 +3348,13 @@ async function changeRequestStatus(id, status) {
             new Date().toLocaleString()
     });
 
-    writeStoredJSON(
+    localStorage.setItem(
         "hnNotifications",
-        notifications
+        JSON.stringify(notifications)
     );
 
-       // ========================================================
-    // SEND CONFIRMATION EMAIL THROUGH LIVE VERCEL BACKEND
+    // ========================================================
+    // SEND EMAIL ONLY AFTER CONFIRMATION
     // ========================================================
 
     if (
@@ -3358,14 +3362,36 @@ async function changeRequestStatus(id, status) {
         request.userEmail
     ) {
 
+        showToast(
+            "Sending confirmation email to " +
+            request.userEmail +
+            " …"
+        );
+
         try {
 
-            await sendPropertyConfirmationEmail(
-                request
+            await homeNestApi(
+                "/api/email/property-confirmed",
+                {
+                    userEmail:
+                        request.userEmail,
+
+                    userName:
+                        request.userName ||
+                        "HomeNest User",
+
+                    propertyName:
+                        request.propertyName,
+
+                    location:
+                        request.location || ""
+                }
             );
 
             showToast(
-                "Property confirmed and email sent successfully. 📧"
+                "Property confirmed and email sent to " +
+                request.userEmail +
+                " 📧"
             );
 
         } catch (error) {
@@ -3376,7 +3402,8 @@ async function changeRequestStatus(id, status) {
             );
 
             showToast(
-                "Property confirmed. Email could not be sent."
+                "Property confirmed, but the email could not be sent: " +
+                escapeHTML(error.message)
             );
         }
 
@@ -3391,9 +3418,8 @@ async function changeRequestStatus(id, status) {
 
     updateAdmin();
     updateUserPortal();
-} 
+}
 
-   
 /* =========================================================
    ADMIN SECTIONS
 ========================================================= */
@@ -3891,7 +3917,9 @@ function addUserMessage(
 }
 
 
-function sendMessage() {
+let chatHistory = [];
+
+async function sendMessage() {
 
     const input =
         document.getElementById(
@@ -3915,18 +3943,77 @@ function sendMessage() {
 
     input.value = "";
 
-    setTimeout(
-        () => {
+    chatHistory.push({
+        role: "user",
+        content: message
+    });
 
-            addBotMessage(
-                generatePropertyAIResponse(
-                    message
-                )
+    const box =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    const thinking =
+        document.createElement("div");
+
+    thinking.className = "message bot";
+    thinking.innerHTML = "🤖 Thinking…";
+
+    if (box) {
+
+        box.appendChild(thinking);
+
+        box.scrollTop =
+            box.scrollHeight;
+    }
+
+    let answer = "";
+    let plainAnswer = "";
+
+    try {
+
+        const data =
+            await homeNestApi(
+                "/api/ai/chat",
+                {
+                    message: message,
+                    property: selectedProperty || null,
+                    history: chatHistory.slice(-10)
+                }
             );
 
-        },
-        400
-    );
+        plainAnswer =
+            (data && data.answer) || "";
+
+        answer =
+            plainAnswer
+                ? escapeHTML(plainAnswer)
+                    .replace(/\n/g, "<br>")
+                : "";
+
+    } catch (error) {
+
+        console.error("AI chat error:", error);
+    }
+
+    thinking.remove();
+
+    if (!answer) {
+
+        answer =
+            generatePropertyAIResponse(
+                message
+            );
+    }
+
+    chatHistory.push({
+        role: "assistant",
+        content:
+            plainAnswer ||
+            "(answered from the offline property assistant)"
+    });
+
+    addBotMessage(answer);
 }
 
 
@@ -4281,27 +4368,33 @@ function setText(
 
 function saveProperties() {
 
-    return writeStoredJSON(
+    localStorage.setItem(
         "hnProperties",
-        properties
+        JSON.stringify(
+            properties
+        )
     );
 }
 
 
 function saveRequests() {
 
-    return writeStoredJSON(
+    localStorage.setItem(
         "hnRequests",
-        requests
+        JSON.stringify(
+            requests
+        )
     );
 }
 
 
 function saveNotifications() {
 
-    return writeStoredJSON(
+    localStorage.setItem(
         "hnNotifications",
-        notifications
+        JSON.stringify(
+            notifications
+        )
     );
 }
 
@@ -4385,69 +4478,27 @@ document.addEventListener(
    INITIALIZE
 ========================================================= */
 
-/* =========================================================
-   GLOBAL FAILURE REPORTING
-   Async click handlers reject silently otherwise.
-========================================================= */
-
-window.addEventListener(
-    "unhandledrejection",
-    event => {
-
-        console.error(
-            "Unhandled promise rejection:",
-            event.reason
-        );
-    }
-);
-
-
-function runStartupStep(name, step) {
-
-    try {
-        step();
-    } catch (error) {
-        console.error(
-            `HomeNest startup step failed: ${name}`,
-            error
-        );
-    }
-}
-
-
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        // Each step is isolated so one failing section cannot
-        // stop the rest of the page from rendering.
-        runStartupStep("applyLanguage", applyLanguage);
+        applyLanguage();
 
-        runStartupStep("renderProperties", renderProperties);
+        renderProperties();
 
-        runStartupStep("renderMap", renderMap);
+        renderMap();
 
-        runStartupStep("updateUserPortal", updateUserPortal);
+        updateUserPortal();
 
-        runStartupStep("updateAdmin", updateAdmin);
+        updateAdmin();
 
-        runStartupStep("loadPropertiesFromBackend", () => {
-
-            loadPropertiesFromBackend()
-                .catch(error => {
-                    console.error(
-                        "Backend property load failed:",
-                        error
-                    );
-                });
-        });
-
-        runStartupStep("restoreLocation", () => {
+        try {
 
             const savedCoords =
-                readStoredJSON(
-                    "hnUserCoords",
-                    null
+                JSON.parse(
+                    localStorage.getItem(
+                        "hnUserCoords"
+                    ) || "null"
                 );
 
             if (
@@ -4461,7 +4512,14 @@ document.addEventListener(
 
                 updateMapDistances();
             }
-        });
+
+        } catch (error) {
+
+            console.error(
+                "Location restore error:",
+                error
+            );
+        }
 
         document
             .querySelectorAll(
@@ -4527,7 +4585,11 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        if (isAdminLoggedIn()) {
+        if (
+            localStorage.getItem(
+                "hnAdminLoggedIn"
+            ) === "true"
+        ) {
 
             document
                 .getElementById(
@@ -4555,7 +4617,7 @@ window.addEventListener(
             () => {
 
                 const saved =
-                    readStoredValue(
+                    localStorage.getItem(
                         "hnLanguage"
                     );
 
@@ -4596,7 +4658,25 @@ if (typeof window.renderAdminUsers !== "function") {
         }
 
         // Get users safely
-        const users = readStoredJSON("hnUsers", []);
+        let users = [];
+
+        try {
+            users =
+                JSON.parse(
+                    localStorage.getItem("hnUsers") || "[]"
+                );
+        } catch (error) {
+            console.error(
+                "Could not load HomeNest users:",
+                error
+            );
+
+            users = [];
+        }
+
+        if (!Array.isArray(users)) {
+            users = [];
+        }
 
         if (users.length === 0) {
 
