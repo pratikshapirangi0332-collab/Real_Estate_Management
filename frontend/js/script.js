@@ -4087,7 +4087,7 @@ document.addEventListener(
 ========================================================= */
 
 const GOOGLE_CLIENT_ID =
-    "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+    "996958875111-cg00ce10sbivh29o49vnekjna4slp3jf.apps.googleusercontent.com";
 
 function loadGoogleIdentityScript(callback) {
 
