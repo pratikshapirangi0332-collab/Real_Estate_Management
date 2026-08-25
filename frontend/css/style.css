@@ -1174,7 +1174,19 @@ footer a{display:block;margin:6px 0}
 /* ================= MOBILE ================= */
 
 @media(max-width:1050px){
- .nav-links{display:none}
+ .nav-links{
+  display:flex;
+  flex:1;
+  min-width:0;
+  overflow-x:auto;
+  white-space:nowrap;
+  gap:18px;
+  -ms-overflow-style:none;
+  scrollbar-width:none
+ }
+ .nav-links::-webkit-scrollbar{display:none}
+ .nav-links a{flex-shrink:0}
+ .logo,.nav-right{flex-shrink:0}
  .category-grid{grid-template-columns:repeat(2,1fr)}
  .property-grid{grid-template-columns:1fr 1fr}
  .map-layout{grid-template-columns:1fr}
@@ -1205,6 +1217,34 @@ footer a{display:block;margin:6px 0}
  .form-group.full{grid-column:auto}
  .admin-cards{grid-template-columns:1fr 1fr}
  .request-card{display:block}
+ .nav-right{gap:5px}
+ .nav-btn,.primary-btn{padding:9px 11px;font-size:12px}
+ .nav-btn span{display:none}
+}
+
+@media(max-width:480px){
+ .nav-inner{gap:12px}
+ .logo span{font-size:18px}
+ .logo-mark{width:36px;height:36px}
+ .hero-content{padding-top:60px}
+ .hero h1{font-size:36px;letter-spacing:-1px}
+ .hero-description{font-size:15px}
+ .hero-tag{font-size:11px;padding:7px 12px}
+ .modal-box{padding:20px;border-radius:18px}
+ .modal-box.large{padding:18px}
+ .modal-title{font-size:24px}
+ .admin-header,.portal-header{flex-wrap:wrap;gap:10px;padding:14px 5%}
+ .admin-main,.portal-main{padding:22px 5%}
+ .admin-cards{grid-template-columns:1fr 1fr}
+ .admin-actions{gap:7px}
+ .admin-action{padding:9px 11px;font-size:11px}
+ th,td{padding:9px 6px;font-size:10px}
+ .admin-table{padding:14px}
+ .property-body{padding:16px}
+ .card-buttons{flex-wrap:wrap}
+ .card-buttons button{flex:1 1 45%}
+ .cta-box h2{font-size:27px}
+ .close-btn{right:10px;top:10px;width:32px;height:32px}
 }
 
 /* ===== SENIOR FRONTEND FIXES ===== */
