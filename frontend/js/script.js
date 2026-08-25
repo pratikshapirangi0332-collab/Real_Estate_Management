@@ -659,33 +659,146 @@ function applyLanguage() {
 }
 
 
+/* =========================================================
+   LANGUAGE — dropdown of options (click button, pick a
+   language, page switches immediately)
+========================================================= */
+
 function changeLanguage() {
 
-    const languages = [
-        "en",
-        "kn",
-        "hi",
-        "mr",
-        "te",
-        "ta",
-        "ml",
-        "gu",
-        "bn",
-        "pa"
-    ];
+    const existingMenu =
+        document.getElementById("hnLanguageMenu");
 
-    let index =
-        languages.indexOf(currentLanguage);
-
-    if (index < 0) {
-        index = 0;
+    if (existingMenu) {
+        closeLanguageMenu();
+        return;
     }
 
-    index =
-        (index + 1) % languages.length;
+    openLanguageMenu();
+}
 
-    currentLanguage =
-        languages[index];
+
+function openLanguageMenu() {
+
+    const anchorBtn =
+        document.getElementById("languageName")?.closest("button");
+
+    if (!anchorBtn) {
+        return;
+    }
+
+    const rect =
+        anchorBtn.getBoundingClientRect();
+
+    const menu =
+        document.createElement("div");
+
+    menu.id = "hnLanguageMenu";
+
+    menu.style.cssText =
+        "position:fixed;" +
+        "top:" + (rect.bottom + 8) + "px;" +
+        "left:" + Math.max(8, rect.right - 190) + "px;" +
+        "width:190px;max-height:320px;overflow:auto;" +
+        "background:#fff;border-radius:12px;" +
+        "box-shadow:0 18px 45px rgba(0,0,0,.25);" +
+        "padding:6px;z-index:999999;font-family:inherit;";
+
+    const codes =
+        Object.keys(translations);
+
+    menu.innerHTML =
+        codes
+            .map(code => {
+
+                const isActive =
+                    code === currentLanguage;
+
+                return (
+                    `<div class="hn-lang-option" data-code="${code}"
+                        style="padding:10px 14px;font-size:13px;
+                        border-radius:8px;cursor:pointer;color:#172033;
+                        ${isActive ? "background:#eef1f7;font-weight:700;" : ""}">
+                        ${escapeHTML(translations[code].language)}
+                    </div>`
+                );
+            })
+            .join("");
+
+    document.body.appendChild(menu);
+
+    menu.querySelectorAll(".hn-lang-option").forEach(option => {
+
+        option.addEventListener("mouseenter", () => {
+            option.style.background = "#f1f4f9";
+        });
+
+        option.addEventListener("mouseleave", () => {
+            option.style.background =
+                option.dataset.code === currentLanguage
+                    ? "#eef1f7"
+                    : "";
+        });
+
+        option.addEventListener("click", event => {
+            event.stopPropagation();
+            selectLanguage(option.dataset.code);
+        });
+    });
+
+    setTimeout(() => {
+        document.addEventListener(
+            "click",
+            handleLanguageMenuOutsideClick,
+            true
+        );
+    }, 0);
+}
+
+
+function closeLanguageMenu() {
+
+    document
+        .getElementById("hnLanguageMenu")
+        ?.remove();
+
+    document.removeEventListener(
+        "click",
+        handleLanguageMenuOutsideClick,
+        true
+    );
+}
+
+
+function handleLanguageMenuOutsideClick(event) {
+
+    const menu =
+        document.getElementById("hnLanguageMenu");
+
+    const anchorBtn =
+        document.getElementById("languageName")?.closest("button");
+
+    if (!menu) {
+        return;
+    }
+
+    if (
+        !menu.contains(event.target) &&
+        event.target !== anchorBtn &&
+        !anchorBtn?.contains(event.target)
+    ) {
+        closeLanguageMenu();
+    }
+}
+
+
+function selectLanguage(code) {
+
+    if (!translations[code]) {
+        return;
+    }
+
+    currentLanguage = code;
 
     applyLanguage();
 
@@ -693,6 +806,8 @@ function changeLanguage() {
         "Language changed to " +
         translations[currentLanguage].language
     );
+
+    closeLanguageMenu();
 
     setTimeout(() => {
 
@@ -2290,7 +2405,7 @@ function submitRequestForm() {
             .toLowerCase();
 
     const password =
-        document.getElementById("hnReqPassword")?.value || "";
+        (document.getElementById("hnReqPassword")?.value || "").trim();
 
     const address =
         document.getElementById("hnReqAddress")?.value.trim() || "";
@@ -2505,9 +2620,9 @@ function login() {
         .toLowerCase();
 
     const password =
-        document.getElementById(
+        (document.getElementById(
             "loginPassword"
-        )?.value || "";
+        )?.value || "").trim();
 
     if (role === "admin") {
 
@@ -3226,10 +3341,6 @@ function renderAdminRequests() {
                             🏠 ${escapeHTML(
                                 request.userAddress || "Not provided"
                             )}
-                        </small>
-                        <br>
-                        <small>
-                            🔑 Password verified
                         </small>
                     </td>
 
