@@ -273,6 +273,8 @@ let homeNestDirectionsRenderer = null;
 let homeNestUserMarker = null;
 let homeNestPropertyMarker = null;
 let homeNestRouteLine = null;
+let homeNestPropertyMarkers = {};
+let homeNestActiveInfoWindow = null;
 
 
 /* =========================================================
@@ -990,8 +992,66 @@ function renderProperties(list = properties) {
         `;
 
         grid.appendChild(card);
+
+        ensurePropertyImageLoads(
+            card.querySelector(".property-img"),
+            property.image
+        );
     });
 }
+
+
+/* =========================================================
+   IMAGE FALLBACK
+   If a property's image URL is broken (or a stale copy
+   saved in localStorage before a fix), swap in a reliable
+   placeholder instead of showing a blank tile.
+========================================================= */
+
+const HOMENEST_FALLBACK_IMAGE =
+    "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=85";
+
+function ensurePropertyImageLoads(element, url) {
+
+    if (!element || !url) {
+
+        if (element) {
+            element.style.backgroundImage =
+                `url('${HOMENEST_FALLBACK_IMAGE}')`;
+        }
+
+        return;
+    }
+
+    const tester = new Image();
+
+    tester.onerror = () => {
+        element.style.backgroundImage =
+            `url('${HOMENEST_FALLBACK_IMAGE}')`;
+    };
+
+    tester.src = url;
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        document
+            .querySelectorAll(".category")
+            .forEach(tile => {
+
+                const match =
+                    (tile.getAttribute("style") || "")
+                        .match(/url\((['"]?)(.*?)\1\)/);
+
+                if (match && match[2]) {
+                    ensurePropertyImageLoads(tile, match[2]);
+                }
+            });
+    }
+);
 
 
 /* =========================================================
@@ -1406,7 +1466,92 @@ window.initGoogleMap = function () {
     console.log(
         "Google DirectionsService ready"
     );
+
+    plotAllPropertiesOnMap();
 };
+
+
+/* =========================================================
+   PLOT EVERY PROPERTY ON THE MAP AT ONCE
+   (instead of one marker appearing only after a click).
+   Each pin shows name, price, bedrooms and bathrooms
+   in a small popup when clicked.
+========================================================= */
+
+function plotAllPropertiesOnMap() {
+
+    if (
+        !homeNestMap ||
+        typeof google === "undefined" ||
+        !google.maps
+    ) {
+        return;
+    }
+
+    Object.values(homeNestPropertyMarkers).forEach(
+        entry => entry.marker.setMap(null)
+    );
+
+    homeNestPropertyMarkers = {};
+
+    const bounds =
+        new google.maps.LatLngBounds();
+
+    properties.forEach(property => {
+
+        const coords =
+            getPropertyCoordinates(property);
+
+        const marker =
+            new google.maps.Marker({
+                position: coords,
+                map: homeNestMap,
+                title: property.name
+            });
+
+        const infoWindow =
+            new google.maps.InfoWindow({
+                content: `
+                    <div style="font-family:inherit;max-width:200px;padding:2px">
+                        <strong>${escapeHTML(property.name)}</strong><br>
+                        ${escapeHTML(property.priceText)} ·
+                        🛏 ${property.bedrooms} ·
+                        🚿 ${property.bathrooms}
+                    </div>
+                `
+            });
+
+        marker.addListener("click", () => {
+
+            if (homeNestActiveInfoWindow) {
+                homeNestActiveInfoWindow.close();
+            }
+
+            infoWindow.open(homeNestMap, marker);
+
+            homeNestActiveInfoWindow = infoWindow;
+
+            selectMapProperty(
+                property,
+                document.querySelector(
+                    `#mapPropertyList .map-item[data-property-id="${property.id}"]`
+                )
+            );
+        });
+
+        homeNestPropertyMarkers[property.id] =
+            { marker, infoWindow };
+
+        bounds.extend(coords);
+    });
+
+    if (properties.length > 1) {
+        homeNestMap.fitBounds(bounds);
+    } else if (properties.length === 1) {
+        homeNestMap.setCenter(getPropertyCoordinates(properties[0]));
+        homeNestMap.setZoom(14);
+    }
+}
 /* =========================================================
    SHOW PROPERTY + REAL DRIVING ROUTE ON GOOGLE MAP
 ========================================================= */
@@ -2062,6 +2207,9 @@ function renderMap() {
                             : ""
                     );
 
+                item.dataset.propertyId =
+                    property.id;
+
                 item.innerHTML = `
 
                     <strong>
@@ -2139,9 +2287,38 @@ function selectMapProperty(
         );
     }
 
-    showPropertyOnGoogleMap(
-        property
-    );
+    // All properties already sit on the map together —
+    // clicking one in the list just pans to its existing
+    // pin and opens its popup, it no longer clears every
+    // other property's marker.
+    const entry =
+        homeNestPropertyMarkers[property.id];
+
+    if (
+        homeNestMap &&
+        typeof google !== "undefined" &&
+        google.maps &&
+        entry
+    ) {
+
+        homeNestMap.panTo(
+            entry.marker.getPosition()
+        );
+
+        homeNestMap.setZoom(14);
+
+        if (homeNestActiveInfoWindow) {
+            homeNestActiveInfoWindow.close();
+        }
+
+        entry.infoWindow.open(
+            homeNestMap,
+            entry.marker
+        );
+
+        homeNestActiveInfoWindow =
+            entry.infoWindow;
+    }
 
     updateMapDistances();
 }
@@ -3672,6 +3849,53 @@ function closeUserPortal() {
 }
 
 
+function logoutUser() {
+
+    currentUser = null;
+
+    localStorage.removeItem("hnUser");
+
+    closeUserPortal();
+
+    showToast("You have been logged out.");
+}
+
+
+function ensureUserLogoutButton() {
+
+    const header =
+        document.querySelector("#userPortal .portal-header");
+
+    if (!header || document.getElementById("hnUserLogoutBtn")) {
+        return;
+    }
+
+    const logoutBtn =
+        document.createElement("button");
+
+    logoutBtn.id = "hnUserLogoutBtn";
+    logoutBtn.className = "nav-btn";
+    logoutBtn.style.cssText = "margin-right:8px;color:#fff;";
+    logoutBtn.textContent = "Logout";
+    logoutBtn.onclick = logoutUser;
+
+    const closeBtn =
+        header.querySelector(".primary-btn");
+
+    if (closeBtn) {
+        header.insertBefore(logoutBtn, closeBtn);
+    } else {
+        header.appendChild(logoutBtn);
+    }
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    ensureUserLogoutButton
+);
+
+
 function updateUserPortal() {
 
     if (!currentUser) {
@@ -4768,32 +4992,21 @@ if (typeof window.renderAdminUsers !== "function") {
             return;
         }
 
-        // Get users safely
-        let users = [];
+        // Every account that has ever logged in / signed up
+        // lives in hnAccounts (see loadAccounts()). This is
+        // the real source of truth for "who has an account",
+        // not a separate log.
+        const accounts =
+            loadAccounts();
 
-        try {
-            users =
-                JSON.parse(
-                    localStorage.getItem("hnUsers") || "[]"
-                );
-        } catch (error) {
-            console.error(
-                "Could not load HomeNest users:",
-                error
-            );
+        const emails =
+            Object.keys(accounts);
 
-            users = [];
-        }
-
-        if (!Array.isArray(users)) {
-            users = [];
-        }
-
-        if (users.length === 0) {
+        if (emails.length === 0) {
 
             table.innerHTML = `
                 <tr>
-                    <td colspan="5">
+                    <td colspan="4">
                         No registered users yet.
                     </td>
                 </tr>
@@ -4803,24 +5016,37 @@ if (typeof window.renderAdminUsers !== "function") {
         }
 
         table.innerHTML =
-            users.map(function (user) {
+            emails.map(function (email) {
+
+                const account =
+                    accounts[email] || {};
+
+                const userRequests =
+                    requests.filter(
+                        r => r.userEmail === email
+                    );
+
+                const confirmedCount =
+                    userRequests.filter(
+                        r => r.status === "confirmed"
+                    ).length;
 
                 return `
                     <tr>
                         <td>
-                            ${user.name || "HomeNest User"}
+                            ${escapeHTML(account.name || "HomeNest User")}
                         </td>
 
                         <td>
-                            ${user.email || "—"}
+                            ${escapeHTML(email)}
                         </td>
 
                         <td>
-                            User
+                            ${userRequests.length}
                         </td>
 
                         <td>
-                            ${user.date || "—"}
+                            ${confirmedCount}
                         </td>
                     </tr>
                 `;
@@ -4910,11 +5136,16 @@ window.openProperty = function (id) {
 
         modalImage.src =
             property.image ||
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c";
+            HOMENEST_FALLBACK_IMAGE;
 
         modalImage.alt =
             property.name ||
             "HomeNest Property";
+
+        modalImage.onerror = function () {
+            this.onerror = null;
+            this.src = HOMENEST_FALLBACK_IMAGE;
+        };
     }
 
 
