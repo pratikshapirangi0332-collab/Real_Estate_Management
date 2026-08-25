@@ -2320,6 +2320,21 @@ function selectMapProperty(
             entry.infoWindow;
     }
 
+    // If the user has shared their current location,
+    // also draw the real driving route to this property
+    // (same Google Maps directions used elsewhere) —
+    // this doesn't remove the other properties' pins.
+    if (userCoords) {
+
+        showPropertyOnGoogleMap(
+            property,
+            {
+                lat: userCoords[0],
+                lng: userCoords[1]
+            }
+        );
+    }
+
     updateMapDistances();
 }
 
@@ -3457,9 +3472,65 @@ function updateAdmin() {
         properties.length
     );
 
+    ensureAdminUserCountCard();
+
+    set(
+        "hnAdminUserCount",
+        Object.keys(loadAccounts()).length
+    );
+
+    renderAdminProfile();
+
     renderAdminRequests();
     renderAdminProperties();
     renderAdminUsers();
+}
+
+
+function ensureAdminUserCountCard() {
+
+    const cardsRow =
+        document.querySelector("#adminPortal .admin-cards");
+
+    if (!cardsRow || document.getElementById("hnAdminUserCountCard")) {
+        return;
+    }
+
+    const card =
+        document.createElement("div");
+
+    card.id = "hnAdminUserCountCard";
+    card.className = "admin-card";
+
+    card.innerHTML = `
+        👥 Registered Users
+        <strong id="hnAdminUserCount">0</strong>
+    `;
+
+    cardsRow.appendChild(card);
+}
+
+
+function renderAdminProfile() {
+
+    const header =
+        document.querySelector("#adminPortal .admin-header > div");
+
+    if (!header || document.getElementById("hnAdminProfileLine")) {
+        return;
+    }
+
+    const adminEmail =
+        localStorage.getItem("hnAdminEmail") || "—";
+
+    const line =
+        document.createElement("small");
+
+    line.id = "hnAdminProfileLine";
+    line.style.cssText = "display:block;color:#aeb8c7;margin-top:2px";
+    line.textContent = "Signed in as " + adminEmail;
+
+    header.appendChild(line);
 }
 
 
@@ -3646,12 +3717,19 @@ async function changeRequestStatus(id, status) {
     // ========================================================
 
     if (
-        status === "confirmed" &&
+        (status === "confirmed" || status === "rejected") &&
         request.userEmail
     ) {
 
+        const endpoint =
+            status === "confirmed"
+                ? "/api/email/property-confirmed"
+                : "/api/email/property-rejected";
+
         showToast(
-            "Sending confirmation email to " +
+            (status === "confirmed"
+                ? "Sending confirmation email to "
+                : "Sending rejection email to ") +
             request.userEmail +
             " …"
         );
@@ -3659,7 +3737,7 @@ async function changeRequestStatus(id, status) {
         try {
 
             await homeNestApi(
-                "/api/email/property-confirmed",
+                endpoint,
                 {
                     userEmail:
                         request.userEmail,
@@ -3677,7 +3755,9 @@ async function changeRequestStatus(id, status) {
             );
 
             showToast(
-                "Property confirmed and email sent to " +
+                (status === "confirmed"
+                    ? "Property confirmed and email sent to "
+                    : "Property rejected and email sent to ") +
                 request.userEmail +
                 " 📧"
             );
@@ -3690,7 +3770,9 @@ async function changeRequestStatus(id, status) {
             );
 
             showToast(
-                "Property confirmed, but the email could not be sent: " +
+                (status === "confirmed"
+                    ? "Property confirmed, but the email could not be sent: "
+                    : "Property rejected, but the email could not be sent: ") +
                 escapeHTML(error.message)
             );
         }
@@ -3890,9 +3972,318 @@ function ensureUserLogoutButton() {
 }
 
 
+function renderUserProfileCard() {
+
+    if (!currentUser) {
+        return;
+    }
+
+    const portalMain =
+        document.querySelector("#userPortal .portal-main");
+
+    if (!portalMain) {
+        return;
+    }
+
+    const accounts =
+        loadAccounts();
+
+    const account =
+        accounts[currentUser.email] || {};
+
+    let card =
+        document.getElementById("hnUserProfileCard");
+
+    if (!card) {
+
+        card =
+            document.createElement("div");
+
+        card.id = "hnUserProfileCard";
+        card.className = "status-list";
+        card.style.marginTop = "20px";
+
+        const grid =
+            portalMain.querySelector(".portal-grid");
+
+        if (grid) {
+            grid.insertAdjacentElement("afterend", card);
+        } else {
+            portalMain.appendChild(card);
+        }
+    }
+
+    card.innerHTML = `
+        <h2>👤 My Profile</h2>
+
+        <div class="request-card" style="margin-top:12px">
+            <div>
+                <strong>${escapeHTML(account.name || currentUser.name || "HomeNest User")}</strong><br>
+                <small style="color:#777">
+                    ✉️ ${escapeHTML(currentUser.email || "—")}<br>
+                    📞 ${escapeHTML(account.phone || "Not provided")}<br>
+                    🏠 ${escapeHTML(account.address || "Not provided")}
+                </small>
+            </div>
+        </div>
+    `;
+}
+
+
 document.addEventListener(
     "DOMContentLoaded",
     ensureUserLogoutButton
+);
+
+
+/* =========================================================
+   HIDE ADMIN LOGIN OPTION FROM THE PUBLIC
+   Regular visitors should only see "👤 User" in the login
+   dropdown. Add ?admin=1 to the URL to reveal the
+   Administrator option again when you need to log in.
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const roleSelect =
+            document.getElementById("loginRole");
+
+        if (!roleSelect) {
+            return;
+        }
+
+        const showAdminOption =
+            new URLSearchParams(window.location.search)
+                .get("admin") === "1";
+
+        if (!showAdminOption) {
+
+            Array.from(roleSelect.options).forEach(option => {
+
+                if (option.value === "admin") {
+                    option.remove();
+                }
+            });
+        }
+    }
+);
+
+
+/* =========================================================
+   GOOGLE SIGN-IN
+   Adds a "Continue with Google" button to the existing
+   login modal (no HTML edits — the button is created here
+   in JS). IMPORTANT: GOOGLE_CLIENT_ID below is a placeholder
+   and will not work as-is. To make this live you need to:
+     1. Create an OAuth Client ID at
+        https://console.cloud.google.com/apis/credentials
+        (type: "Web application").
+     2. Add your site's real domain under
+        "Authorized JavaScript origins".
+     3. Paste that client ID in GOOGLE_CLIENT_ID below.
+   Without that, the button will render but sign-in will fail.
+========================================================= */
+
+const GOOGLE_CLIENT_ID =
+    "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+
+function loadGoogleIdentityScript(callback) {
+
+    if (
+        window.google &&
+        google.accounts &&
+        google.accounts.id
+    ) {
+        callback();
+        return;
+    }
+
+    const existing =
+        document.getElementById("hnGoogleIdentityScript");
+
+    if (existing) {
+        existing.addEventListener("load", callback);
+        return;
+    }
+
+    const script =
+        document.createElement("script");
+
+    script.id = "hnGoogleIdentityScript";
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = callback;
+
+    document.head.appendChild(script);
+}
+
+
+function decodeGoogleCredential(token) {
+
+    try {
+
+        const payload =
+            token.split(".")[1];
+
+        const json =
+            decodeURIComponent(
+                atob(
+                    payload
+                        .replace(/-/g, "+")
+                        .replace(/_/g, "/")
+                )
+                    .split("")
+                    .map(
+                        c =>
+                            "%" +
+                            ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+                    )
+                    .join("")
+            );
+
+        return JSON.parse(json);
+
+    } catch (error) {
+
+        console.error(
+            "Could not read Google credential:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+function handleGoogleCredential(response) {
+
+    const profile =
+        decodeGoogleCredential(response.credential);
+
+    if (!profile || !profile.email) {
+
+        showToast(
+            "Google sign-in failed. Please try again."
+        );
+
+        return;
+    }
+
+    const email =
+        profile.email.trim().toLowerCase();
+
+    const accounts =
+        loadAccounts();
+
+    let account =
+        accounts[email];
+
+    if (!account) {
+
+        account = {
+            name: profile.name || email.split("@")[0],
+            email: email,
+            password: null,
+            phone: "",
+            address: "",
+            googleAccount: true
+        };
+
+        accounts[email] = account;
+
+        saveAccounts(accounts);
+
+        showToast(
+            "New HomeNest account created for " +
+            email +
+            "."
+        );
+    }
+
+    currentUser = {
+        name: account.name,
+        email: email,
+        phone: account.phone || "",
+        address: account.address || ""
+    };
+
+    localStorage.setItem(
+        "hnUser",
+        JSON.stringify(currentUser)
+    );
+
+    closeModal("loginModal");
+
+    showToast(
+        "Signed in with Google as " + email
+    );
+
+    updateUserPortal();
+}
+
+
+function ensureGoogleSignInButton() {
+
+    const modalBox =
+        document.querySelector("#loginModal .modal-box");
+
+    if (
+        !modalBox ||
+        document.getElementById("hnGoogleSignIn")
+    ) {
+        return;
+    }
+
+    const subtitle =
+        modalBox.querySelector(".modal-subtitle");
+
+    const container =
+        document.createElement("div");
+
+    container.id = "hnGoogleSignIn";
+    container.style.cssText =
+        "margin-bottom:16px;display:flex;justify-content:center";
+
+    if (subtitle) {
+        subtitle.insertAdjacentElement("afterend", container);
+    } else {
+        modalBox.appendChild(container);
+    }
+
+    loadGoogleIdentityScript(() => {
+
+        if (
+            !window.google ||
+            !google.accounts ||
+            !google.accounts.id
+        ) {
+            return;
+        }
+
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleCredential
+        });
+
+        google.accounts.id.renderButton(
+            container,
+            {
+                theme: "outline",
+                size: "large",
+                width: 320,
+                text: "continue_with"
+            }
+        );
+    });
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    ensureGoogleSignInButton
 );
 
 
@@ -3901,6 +4292,8 @@ function updateUserPortal() {
     if (!currentUser) {
         return;
     }
+
+    renderUserProfileCard();
 
     const userRequests =
         requests.filter(
