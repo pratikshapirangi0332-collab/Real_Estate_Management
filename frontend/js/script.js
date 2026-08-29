@@ -2962,6 +2962,8 @@ function login() {
         "!"
     );
 
+    recordLoginHistory(email);
+
     updateUserPortal();
 }
 
@@ -3484,6 +3486,143 @@ function updateAdmin() {
     renderAdminRequests();
     renderAdminProperties();
     renderAdminUsers();
+    renderAdminContactMessages();
+    renderAdminLoginHistory();
+}
+
+
+/* =========================================================
+   LOGIN HISTORY (for admin)
+========================================================= */
+
+function recordLoginHistory(email) {
+
+    let history = [];
+
+    try {
+        history =
+            JSON.parse(localStorage.getItem("hnLoginHistory") || "[]");
+    } catch (error) {
+        history = [];
+    }
+
+    const entry = {
+        email: email,
+        date: new Date().toLocaleString(),
+        lat: null,
+        lng: null
+    };
+
+    history.push(entry);
+
+    localStorage.setItem(
+        "hnLoginHistory",
+        JSON.stringify(history)
+    );
+
+    // Best-effort — only fills in location if the browser
+    // already has permission; never prompts on its own.
+    if (navigator.permissions && navigator.geolocation) {
+
+        navigator.permissions
+            .query({ name: "geolocation" })
+            .then(result => {
+
+                if (result.state !== "granted") {
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(position => {
+
+                    entry.lat = position.coords.latitude;
+                    entry.lng = position.coords.longitude;
+
+                    localStorage.setItem(
+                        "hnLoginHistory",
+                        JSON.stringify(history)
+                    );
+
+                    renderAdminLoginHistory();
+                });
+            })
+            .catch(() => {});
+    }
+}
+
+
+function renderAdminLoginHistory() {
+
+    const adminMain =
+        document.querySelector("#adminPortal .admin-main");
+
+    if (!adminMain) {
+        return;
+    }
+
+    let history = [];
+
+    try {
+        history =
+            JSON.parse(localStorage.getItem("hnLoginHistory") || "[]");
+    } catch (error) {
+        history = [];
+    }
+
+    const accounts =
+        loadAccounts();
+
+    let box =
+        document.getElementById("hnAdminHistoryBox");
+
+    if (!box) {
+
+        box = document.createElement("div");
+        box.id = "hnAdminHistoryBox";
+        box.className = "admin-table";
+        box.style.marginTop = "24px";
+        adminMain.appendChild(box);
+    }
+
+    const rows =
+        history.length
+            ? history
+                  .slice()
+                  .reverse()
+                  .slice(0, 100)
+                  .map(entry => {
+
+                      const account =
+                          accounts[entry.email] || {};
+
+                      const location =
+                          entry.lat != null
+                              ? entry.lat.toFixed(4) + ", " + entry.lng.toFixed(4)
+                              : (account.location
+                                  ? (account.location.address ||
+                                     account.location.lat.toFixed(4) + ", " + account.location.lng.toFixed(4))
+                                  : "Not shared");
+
+                      return `
+                        <tr>
+                            <td>${escapeHTML(entry.email)}</td>
+                            <td>${escapeHTML(entry.date)}</td>
+                            <td>${escapeHTML(account.address || "—")}</td>
+                            <td>${escapeHTML(location)}</td>
+                        </tr>
+                      `;
+                  })
+                  .join("")
+            : `<tr><td colspan="4">No logins recorded yet.</td></tr>`;
+
+    box.innerHTML = `
+        <h2>🕒 Login History</h2>
+        <table>
+            <thead>
+                <tr><th>Email</th><th>Date &amp; Time</th><th>Saved Address</th><th>Location</th></tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
 }
 
 
@@ -4013,20 +4152,221 @@ function renderUserProfileCard() {
         }
     }
 
+    const photoSrc =
+        account.photo ||
+        "https://ui-avatars.com/api/?background=172033&color=fff&name=" +
+        encodeURIComponent(account.name || currentUser.email);
+
+    const locationText =
+        account.location
+            ? account.location.address ||
+              (account.location.lat.toFixed(4) + ", " + account.location.lng.toFixed(4))
+            : "Not shared";
+
     card.innerHTML = `
         <h2>👤 My Profile</h2>
 
-        <div class="request-card" style="margin-top:12px">
-            <div>
-                <strong>${escapeHTML(account.name || currentUser.name || "HomeNest User")}</strong><br>
-                <small style="color:#777">
-                    ✉️ ${escapeHTML(currentUser.email || "—")}<br>
-                    📞 ${escapeHTML(account.phone || "Not provided")}<br>
-                    🏠 ${escapeHTML(account.address || "Not provided")}
-                </small>
+        <div class="request-card" style="margin-top:12px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+
+            <div style="text-align:center">
+                <img id="hnProfilePhoto" src="${photoSrc}"
+                     style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid #eee">
+                <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">
+                    <button class="nav-btn" style="font-size:11px;padding:6px 8px;color:#172033"
+                            onclick="document.getElementById('hnPhotoCamera').click()">📷</button>
+                    <button class="nav-btn" style="font-size:11px;padding:6px 8px;color:#172033"
+                            onclick="document.getElementById('hnPhotoGallery').click()">🖼</button>
+                </div>
+                <input type="file" id="hnPhotoCamera" accept="image/*" capture="environment" style="display:none" onchange="handleProfilePhoto(this)">
+                <input type="file" id="hnPhotoGallery" accept="image/*" style="display:none" onchange="handleProfilePhoto(this)">
+            </div>
+
+            <div style="flex:1;min-width:220px">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input id="hnProfileName" value="${escapeHTML(account.name || currentUser.name || "")}">
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input value="${escapeHTML(currentUser.email || "")}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input id="hnProfilePhone" value="${escapeHTML(account.phone || "")}" placeholder="10-digit mobile number">
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input id="hnProfileDob" type="date" value="${escapeHTML(account.dob || "")}">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="hnProfileGender">
+                        <option value="">Prefer not to say</option>
+                        <option value="Female" ${account.gender === "Female" ? "selected" : ""}>Female</option>
+                        <option value="Male" ${account.gender === "Male" ? "selected" : ""}>Male</option>
+                        <option value="Other" ${account.gender === "Other" ? "selected" : ""}>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="hnProfileAddress" rows="2">${escapeHTML(account.address || "")}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label><br>
+                    <small style="color:#777">📍 ${escapeHTML(locationText)}</small><br>
+                    <button class="nav-btn" style="color:#172033;margin-top:6px;font-size:12px" onclick="detectProfileLocation()">
+                        Detect My Location
+                    </button>
+                </div>
+
+                <button class="primary-btn" style="width:100%;margin-top:6px" onclick="saveUserProfile()">
+                    Save Profile
+                </button>
             </div>
         </div>
     `;
+}
+
+
+function handleProfilePhoto(input) {
+
+    const file =
+        input.files && input.files[0];
+
+    if (!file || !currentUser) {
+        return;
+    }
+
+    const reader =
+        new FileReader();
+
+    reader.onload = () => {
+
+        const accounts =
+            loadAccounts();
+
+        const account =
+            accounts[currentUser.email] || {};
+
+        account.photo = reader.result;
+
+        accounts[currentUser.email] = account;
+
+        saveAccounts(accounts);
+
+        const img =
+            document.getElementById("hnProfilePhoto");
+
+        if (img) {
+            img.src = reader.result;
+        }
+
+        showToast("Profile photo updated.");
+    };
+
+    reader.readAsDataURL(file);
+}
+
+
+function detectProfileLocation() {
+
+    if (!navigator.geolocation) {
+
+        showToast("Location isn't available on this device.");
+        return;
+    }
+
+    showToast("📍 Detecting your location...");
+
+    navigator.geolocation.getCurrentPosition(
+        position => {
+
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            const accounts = loadAccounts();
+            const account = accounts[currentUser.email] || {};
+
+            account.location = { lat, lng };
+
+            const finish = () => {
+                accounts[currentUser.email] = account;
+                saveAccounts(accounts);
+                renderUserProfileCard();
+                showToast("Location saved to your profile.");
+            };
+
+            if (typeof google !== "undefined" && google.maps) {
+
+                new google.maps.Geocoder().geocode(
+                    { location: { lat, lng } },
+                    (results, status) => {
+
+                        if (status === "OK" && results[0]) {
+                            account.location.address = results[0].formatted_address;
+                        }
+
+                        finish();
+                    }
+                );
+
+            } else {
+
+                finish();
+            }
+        },
+        () => {
+            showToast("Couldn't get your location — please allow location access.");
+        }
+    );
+}
+
+
+function saveUserProfile() {
+
+    if (!currentUser) {
+        return;
+    }
+
+    const accounts =
+        loadAccounts();
+
+    const account =
+        accounts[currentUser.email] || {};
+
+    account.name =
+        document.getElementById("hnProfileName")?.value.trim() || account.name;
+
+    account.phone =
+        document.getElementById("hnProfilePhone")?.value.trim() || "";
+
+    account.dob =
+        document.getElementById("hnProfileDob")?.value || "";
+
+    account.gender =
+        document.getElementById("hnProfileGender")?.value || "";
+
+    account.address =
+        document.getElementById("hnProfileAddress")?.value.trim() || "";
+
+    accounts[currentUser.email] = account;
+
+    saveAccounts(accounts);
+
+    currentUser.name = account.name;
+    currentUser.phone = account.phone;
+    currentUser.address = account.address;
+
+    localStorage.setItem("hnUser", JSON.stringify(currentUser));
+
+    showToast("Profile saved.");
 }
 
 
@@ -4043,6 +4383,13 @@ document.addEventListener(
    Administrator option again when you need to log in.
 ========================================================= */
 
+/* =========================================================
+   ADMIN NOW HAS ITS OWN PAGE (admin-login.html), so the
+   Administrator option is removed from the shared user
+   login dropdown entirely, and a small "Admin Login" link
+   is added near the nav login button.
+========================================================= */
+
 document.addEventListener(
     "DOMContentLoaded",
     () => {
@@ -4050,15 +4397,7 @@ document.addEventListener(
         const roleSelect =
             document.getElementById("loginRole");
 
-        if (!roleSelect) {
-            return;
-        }
-
-        const showAdminOption =
-            new URLSearchParams(window.location.search)
-                .get("admin") === "1";
-
-        if (!showAdminOption) {
+        if (roleSelect) {
 
             Array.from(roleSelect.options).forEach(option => {
 
@@ -4067,7 +4406,525 @@ document.addEventListener(
                 }
             });
         }
+
+        ensureAdminLoginLink();
+
+        // If we were just sent back here after a
+        // successful admin login on admin-login.html,
+        // open the admin portal automatically.
+        if (
+            new URLSearchParams(window.location.search)
+                .get("openAdmin") === "1" &&
+            localStorage.getItem("hnAdminLoggedIn") === "true"
+        ) {
+
+            document
+                .getElementById("adminPortal")
+                ?.classList.add("active");
+
+            updateAdmin();
+        }
     }
+);
+
+
+function ensureAdminLoginLink() {
+
+    const navRight =
+        document.querySelector(".nav-right");
+
+    if (!navRight || document.getElementById("hnAdminLoginLink")) {
+        return;
+    }
+
+    const link =
+        document.createElement("a");
+
+    link.id = "hnAdminLoginLink";
+    link.href = "admin-login.html";
+    link.className = "nav-btn";
+    link.style.cssText =
+        "text-decoration:none;display:inline-flex;align-items:center;font-size:12px";
+    link.textContent = "Admin";
+
+    navRight.appendChild(link);
+}
+
+
+function adminPageLogin() {
+
+    const email =
+        (document.getElementById("adminEmail")?.value || "")
+            .trim()
+            .toLowerCase();
+
+    const password =
+        (document.getElementById("adminPassword")?.value || "")
+            .trim();
+
+    const feedback =
+        document.getElementById("adminLoginFeedback");
+
+    if (
+        email === "pratikshapirangi0332@gmail.com" &&
+        password === "pratiksha@214"
+    ) {
+
+        localStorage.setItem("hnAdminLoggedIn", "true");
+        localStorage.setItem("hnAdminEmail", email);
+
+        window.location.href = "index.html?openAdmin=1";
+
+    } else if (feedback) {
+
+        feedback.textContent =
+            "Invalid administrator credentials.";
+        feedback.style.color = "#d93025";
+    }
+}
+
+
+/* =========================================================
+   CONTACT-US GATE
+   Shown once per browser session, before the homepage is
+   usable. Submissions are stored and shown to the admin.
+========================================================= */
+
+function showContactGate() {
+
+    if (document.getElementById("hnContactGate")) {
+        return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    const overlay =
+        document.createElement("div");
+
+    overlay.id = "hnContactGate";
+    overlay.style.cssText =
+        "position:fixed;inset:0;background:#0f1420;" +
+        "z-index:9999999;display:flex;align-items:center;" +
+        "justify-content:center;padding:20px;overflow:auto";
+
+    overlay.innerHTML = `
+        <div style="width:min(460px,94vw);background:#fff;
+             border-radius:20px;padding:32px 28px;
+             box-shadow:0 25px 60px rgba(0,0,0,.35)">
+
+            <h2 class="modal-title">👋 Welcome to HomeNest</h2>
+            <p class="modal-subtitle">
+                Tell us a bit about yourself before you continue.
+            </p>
+
+            <div class="form-group">
+                <label>First Name</label>
+                <input id="hnGateFirstName" placeholder="First name">
+            </div>
+
+            <div class="form-group">
+                <label>Last Name</label>
+                <input id="hnGateLastName" placeholder="Last name">
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input id="hnGateEmail" type="email" placeholder="you@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input id="hnGatePhone" placeholder="10-digit mobile number">
+            </div>
+
+            <div class="form-group">
+                <label>Message</label>
+                <textarea id="hnGateMessage" rows="3" placeholder="What are you looking for?"></textarea>
+            </div>
+
+            <div id="hnGateFeedback" style="min-height:18px;font-size:13px;color:#d93025;margin-bottom:6px"></div>
+
+            <button class="primary-btn" style="width:100%" onclick="submitContactGate()">
+                Continue to HomeNest
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+
+async function submitContactGate() {
+
+    const firstName =
+        document.getElementById("hnGateFirstName")?.value.trim();
+
+    const lastName =
+        document.getElementById("hnGateLastName")?.value.trim();
+
+    const email =
+        document.getElementById("hnGateEmail")?.value.trim();
+
+    const phone =
+        document.getElementById("hnGatePhone")?.value.trim();
+
+    const message =
+        document.getElementById("hnGateMessage")?.value.trim();
+
+    const feedback =
+        document.getElementById("hnGateFeedback");
+
+    if (!firstName || !lastName || !email || !phone) {
+
+        if (feedback) {
+            feedback.textContent =
+                "Please fill in your name, email and phone number.";
+        }
+
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+
+        if (feedback) {
+            feedback.textContent =
+                "Please enter a valid email address.";
+        }
+
+        return;
+    }
+
+    const submission = {
+        id: Date.now(),
+        firstName,
+        lastName,
+        email,
+        phone,
+        message: message || "",
+        date: new Date().toLocaleString()
+    };
+
+    let submissions = [];
+
+    try {
+        submissions =
+            JSON.parse(localStorage.getItem("hnContactSubmissions") || "[]");
+    } catch (error) {
+        submissions = [];
+    }
+
+    submissions.push(submission);
+
+    localStorage.setItem(
+        "hnContactSubmissions",
+        JSON.stringify(submissions)
+    );
+
+    // Best-effort — homepage still opens even if this fails.
+    try {
+
+        await homeNestApi("/api/email/contact-us", submission);
+
+    } catch (error) {
+
+        console.error("Contact-us email error:", error);
+    }
+
+    sessionStorage.setItem("hnContactGateDone", "true");
+
+    document.getElementById("hnContactGate")?.remove();
+
+    document.body.style.overflow = "";
+
+    showToast("Thanks, " + firstName + "! Welcome to HomeNest.");
+
+    renderAdminContactMessages();
+}
+
+
+function renderAdminContactMessages() {
+
+    const adminMain =
+        document.querySelector("#adminPortal .admin-main");
+
+    if (!adminMain) {
+        return;
+    }
+
+    let submissions = [];
+
+    try {
+        submissions =
+            JSON.parse(localStorage.getItem("hnContactSubmissions") || "[]");
+    } catch (error) {
+        submissions = [];
+    }
+
+    let box =
+        document.getElementById("hnAdminContactBox");
+
+    if (!box) {
+
+        box = document.createElement("div");
+        box.id = "hnAdminContactBox";
+        box.className = "admin-table";
+        box.style.marginTop = "24px";
+        adminMain.appendChild(box);
+    }
+
+    const rows =
+        submissions.length
+            ? submissions
+                  .slice()
+                  .reverse()
+                  .map(
+                      s => `
+                        <tr>
+                            <td>${escapeHTML(s.firstName + " " + s.lastName)}</td>
+                            <td>${escapeHTML(s.email)}</td>
+                            <td>${escapeHTML(s.phone)}</td>
+                            <td>${escapeHTML(s.message || "—")}</td>
+                            <td>${escapeHTML(s.date)}</td>
+                        </tr>
+                      `
+                  )
+                  .join("")
+            : `<tr><td colspan="5">No contact-us messages yet.</td></tr>`;
+
+    box.innerHTML = `
+        <h2>📨 Contact-Us Messages</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Date</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        // Only gate the actual homepage, not the admin page.
+        if (
+            document.getElementById("adminEmail")
+        ) {
+            return;
+        }
+
+        if (sessionStorage.getItem("hnContactGateDone") !== "true") {
+            showContactGate();
+        }
+    }
+);
+
+
+/* =========================================================
+   VOICE NAVIGATION
+   Floating mic button — say "home", "properties", "map",
+   "profile", "login" or "logout" to jump around the site.
+   Only works in browsers that support the Web Speech API
+   (Chrome/Edge); the button quietly hides elsewhere.
+========================================================= */
+
+function ensureVoiceNavButton() {
+
+    if (
+        document.getElementById("adminEmail") ||
+        document.getElementById("hnVoiceNavBtn")
+    ) {
+        return;
+    }
+
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        return;
+    }
+
+    const btn =
+        document.createElement("button");
+
+    btn.id = "hnVoiceNavBtn";
+    btn.title = "Voice navigation — click and speak a command";
+    btn.textContent = "🎤";
+    btn.style.cssText =
+        "position:fixed;bottom:25px;left:25px;width:52px;height:52px;" +
+        "border-radius:50%;border:none;background:#172033;color:#fff;" +
+        "font-size:22px;cursor:pointer;z-index:999998;" +
+        "box-shadow:0 10px 25px rgba(0,0,0,.3)";
+
+    const recognition =
+        new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = event => {
+
+        const command =
+            event.results[0][0].transcript
+                .toLowerCase()
+                .trim();
+
+        showToast('🎤 Heard: "' + command + '"');
+        runVoiceCommand(command);
+    };
+
+    recognition.onerror = () => {
+        showToast("Didn't catch that — try again.");
+    };
+
+    btn.onclick = () => {
+
+        try {
+            recognition.start();
+            showToast("🎤 Listening...");
+        } catch (error) {
+            // already listening, ignore
+        }
+    };
+
+    document.body.appendChild(btn);
+}
+
+
+function runVoiceCommand(command) {
+
+    if (command.includes("home")) {
+        document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
+        return;
+    }
+
+    if (command.includes("propert")) {
+        document.getElementById("properties")?.scrollIntoView({ behavior: "smooth" });
+        return;
+    }
+
+    if (command.includes("map") || command.includes("around")) {
+        document.getElementById("map")?.scrollIntoView({ behavior: "smooth" });
+        return;
+    }
+
+    if (command.includes("profile") || command.includes("dashboard")) {
+        openUserPortal();
+        return;
+    }
+
+    if (command.includes("logout") || command.includes("log out")) {
+        logoutUser();
+        return;
+    }
+
+    if (command.includes("login") || command.includes("log in")) {
+        openLogin();
+        return;
+    }
+
+    if (command.includes("contact")) {
+        document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+        return;
+    }
+
+    showToast("Try saying: home, properties, map, profile, login or logout.");
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    ensureVoiceNavButton
+);
+
+
+/* =========================================================
+   LEGAL & POLICIES
+========================================================= */
+
+function ensureLegalLink() {
+
+    const footerBottom =
+        document.querySelector(".footer-bottom");
+
+    if (!footerBottom || document.getElementById("hnLegalLink")) {
+        return;
+    }
+
+    const link =
+        document.createElement("a");
+
+    link.id = "hnLegalLink";
+    link.href = "#";
+    link.style.cssText = "color:inherit;text-decoration:underline;margin-left:14px";
+    link.textContent = "Legal & Policies";
+    link.onclick = event => {
+        event.preventDefault();
+        openLegalModal();
+    };
+
+    footerBottom.appendChild(link);
+}
+
+
+function openLegalModal() {
+
+    let modal =
+        document.getElementById("hnLegalModal");
+
+    if (!modal) {
+
+        modal = document.createElement("div");
+        modal.id = "hnLegalModal";
+        modal.className = "modal";
+        modal.style.cssText =
+            "position:fixed;inset:0;background:rgba(0,0,0,.5);" +
+            "z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px";
+
+        modal.innerHTML = `
+            <div class="modal-box" style="max-height:80vh;overflow:auto">
+                <h2 class="modal-title">Legal &amp; Policies</h2>
+
+                <h3 style="margin-top:14px">Privacy Policy</h3>
+                <p style="color:#555;font-size:14px;line-height:1.6">
+                    HomeNest collects the information you provide (name, email,
+                    phone, address and, if you allow it, your location) only to
+                    help you find and request properties, and to let our team
+                    reach you about your requests. We don't sell your data to
+                    third parties.
+                </p>
+
+                <h3 style="margin-top:14px">Terms of Use</h3>
+                <p style="color:#555;font-size:14px;line-height:1.6">
+                    Property listings on HomeNest are for informational purposes.
+                    Please verify all details directly with our team before
+                    making any payment or commitment.
+                </p>
+
+                <p style="color:#999;font-size:12px;margin-top:14px">
+                    This is placeholder text — please have it reviewed by a
+                    legal professional before publishing.
+                </p>
+
+                <button class="primary-btn" style="width:100%;margin-top:10px"
+                        onclick="document.getElementById('hnLegalModal').remove()">
+                    Close
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+    }
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    ensureLegalLink
 );
 
 
@@ -4087,7 +4944,7 @@ document.addEventListener(
 ========================================================= */
 
 const GOOGLE_CLIENT_ID =
-    "996958875111-cg00ce10sbivh29o49vnekjna4slp3jf.apps.googleusercontent.com";
+    "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
 
 function loadGoogleIdentityScript(callback) {
 
@@ -4220,6 +5077,8 @@ function handleGoogleCredential(response) {
     showToast(
         "Signed in with Google as " + email
     );
+
+    recordLoginHistory(email);
 
     updateUserPortal();
 }
